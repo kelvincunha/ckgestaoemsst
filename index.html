@@ -207,6 +207,14 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 </style>
 </head>
 <body>
+
+<!-- LOADING OVERLAY -->
+<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
+  <div style="width:52px;height:52px;background:var(--brand);border-radius:14px;display:flex;align-items:center;justify-content:center">
+    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/></svg>
+  </div>
+  <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
+</div>
 <div class="layout">
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -719,7 +727,7 @@ const supa = supabase.createClient(SUPA_URL, SUPA_KEY_RAW);
 // Sync status indicator
 function setSyncStatus(status){
   const el=document.getElementById('sync-status');
-  if(!el)return;
+  if(!el){console.log('Status:',status);return;}
   const map={syncing:'⟳ Sincronizando...',ok:'☁️ Salvo',error:'⚠️ Erro ao salvar'};
   const col={syncing:'#F5A623',ok:'#2E7D5E',error:'#C0392B'};
   el.textContent=map[status]||'';
@@ -1278,15 +1286,6 @@ function exportReportPDF(){
   printH(html);
 }
 function pdfH(title,body){return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:30px}h2,h3{color:#1B4D3E}p{margin:4px 0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#1B4D3E;color:white;padding:6px 8px;text-align:left;font-size:11px}td{padding:5px 8px;border-bottom:.5px solid #ddd;font-size:11px}tr:nth-child(even) td{background:#f7f7f7}</style></head><body>${body}
-<!-- LOADING OVERLAY -->
-
-
-
-<!-- LOADING OVERLAY (hidden by default) -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
-  <div style="width:52px;height:52px;background:var(--brand);border-radius:14px;display:flex;align-items:center;justify-content:center">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/></svg>
-  </div>
   <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
@@ -1767,15 +1766,6 @@ function buildPDFDoc(title, sections){
   const dateStr=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
   const footer=`<div class="footer"><span>Segurança &amp; Trabalho — Sistema de Gestão</span><span>Gerado em ${dateStr}</span></div>`;
   return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>${css}</style></head><body><div class="page"><h1>${title}</h1><div class="subtitle">Emitido em ${dateStr}</div>${sections.join('')}${footer}</div>
-<!-- LOADING OVERLAY -->
-
-
-
-<!-- LOADING OVERLAY (hidden by default) -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
-  <div style="width:52px;height:52px;background:var(--brand);border-radius:14px;display:flex;align-items:center;justify-content:center">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/></svg>
-  </div>
   <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
@@ -1888,7 +1878,7 @@ function exportRelatorioGeralPDF(){
 
 // INIT
 function forceOffline(){
-  document.getElementById('loading-overlay').style.display='none';
+  const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';
   try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e){clients=[]}
   try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e){services=[]}
   try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e){agendamentos=[]}
@@ -1913,7 +1903,7 @@ function loadLocal(){
   
   // 1. Carrega dados locais e abre o sistema IMEDIATAMENTE
   loadLocal();
-  document.getElementById('loading-overlay').style.display='none';
+  const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';
   updateStats();renderClients();updateAlertBadge();
   showPage('dashboard');
 
@@ -1964,15 +1954,6 @@ function loadLocal(){
 })();
 </script>
 
-<!-- LOADING OVERLAY -->
-
-
-
-<!-- LOADING OVERLAY (hidden by default) -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
-  <div style="width:52px;height:52px;background:var(--brand);border-radius:14px;display:flex;align-items:center;justify-content:center">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/></svg>
-  </div>
   <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
