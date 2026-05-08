@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html><!-- v7.0 -->
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -880,7 +880,7 @@ function renderDashboard(){
   const futA=agendamentos.filter(a=>a.data>=tod()&&a.status!=='Cancelado'&&a.status!=='Concluído').length;
   const hoje=agendamentos.filter(a=>a.data===tod()&&a.status!=='Cancelado').length;
 
-  document.getElementById('kpi-grid').innerHTML=`
+  (()=>{const __e=document.getElementById('kpi-grid');if(__e)__e.innerHTML=`})();
     <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-value">${clients.length}</div><div class="kpi-label">Total de Clientes</div><div class="kpi-sub">${clients.filter(c=>c.status==='Ativo').length} ativos</div></div>
     <div class="kpi-card info"><div class="kpi-icon">📅</div><div class="kpi-value">${futA}</div><div class="kpi-label">Agendamentos Futuros</div><div class="kpi-sub">${hoje} hoje</div></div>
     <div class="kpi-card accent"><div class="kpi-icon">🔧</div><div class="kpi-value">${services.length}</div><div class="kpi-label">Serviços Registrados</div><div class="kpi-sub">${services.filter(s=>s.status==='Concluído').length} concluídos</div></div>
@@ -909,7 +909,7 @@ function renderMonthBars(){
   }
   const counts=months.map(m=>services.filter(s=>s.data&&s.data.startsWith(m.ym)).length);
   const max=Math.max(...counts,1);
-  document.getElementById('month-bars').innerHTML=counts.map((c,i)=>`
+  const _mb=document.getElementById('month-bars');if(!_mb)return;_mb.innerHTML=counts.map((c,i)=>`
     <div class="month-bar-wrap">
       <div class="month-bar-count">${c||''}</div>
       <div class="month-bar" style="height:${Math.max(4,(c/max)*72)}px" title="${months[i].label}: ${c} serviços"></div>
@@ -1167,7 +1167,7 @@ function renderRelatorio(){
   const ym=`${repYear}-${String(repMonth+1).padStart(2,'0')}`;
   const ms=services.filter(s=>s.data&&s.data.startsWith(ym));
   const ma=agendamentos.filter(a=>a.data&&a.data.startsWith(ym));
-  document.getElementById('rep-stats').innerHTML=`
+  (()=>{const __e=document.getElementById('rep-stats');if(__e)__e.innerHTML=`})();
     <div class="kpi-card"><div class="kpi-icon">🔧</div><div class="kpi-value">${ms.length}</div><div class="kpi-label">Serviços</div></div>
     <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" style="color:var(--brand-light)">${ms.filter(s=>s.status==='Concluído').length}</div><div class="kpi-label">Concluídos</div></div>
     <div class="kpi-card accent"><div class="kpi-icon">📅</div><div class="kpi-value">${ma.length}</div><div class="kpi-label">Agendamentos</div></div>
@@ -1285,7 +1285,7 @@ function exportReportPDF(){
   const html=pdfH(`Relatório ${MESES[repMonth]} ${repYear}`,`<h2>Relatório ${MESES[repMonth]} ${repYear}</h2><h3 style="margin-top:16px">Agendamentos</h3><table><tr><th>Empresa</th><th>Tipo</th><th>Data</th><th>Status</th></tr>${ma.map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${a.tipo}</td><td>${fD(a.data)}</td><td>${a.status}</td></tr>`}).join('')}</table><h3 style="margin-top:16px">Serviços</h3><table><tr><th>Empresa</th><th>Tipo</th><th>Data</th><th>Status</th></tr>${ms.map(s=>{const c=clients.find(x=>x.id===s.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${s.tipo}</td><td>${fD(s.data)}</td><td>${s.status}</td></tr>`}).join('')}</table>`);
   printH(html);
 }
-function pdfH(title,body){return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:30px}h2,h3{color:#1B4D3E}p{margin:4px 0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#1B4D3E;color:white;padding:6px 8px;text-align:left;font-size:11px}td{padding:5px 8px;border-bottom:.5px solid #ddd;font-size:11px}tr:nth-child(even) td{background:#f7f7f7}</style></head><body>${body}
+function pdfH(title,body){return`<!DOCTYPE html><!-- v7.0 --><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:30px}h2,h3{color:#1B4D3E}p{margin:4px 0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#1B4D3E;color:white;padding:6px 8px;text-align:left;font-size:11px}td{padding:5px 8px;border-bottom:.5px solid #ddd;font-size:11px}tr:nth-child(even) td{background:#f7f7f7}</style></head><body>${body}
   <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
@@ -1653,8 +1653,7 @@ function renderTimeline(){
   }
   const counts=months.map(m=>services.filter(s=>s.data&&s.data.startsWith(m.ym)).length);
   const agCounts=months.map(m=>agendamentos.filter(a=>a.data&&a.data.startsWith(m.ym)).length);
-  const svg=document.getElementById('svg-timeline');
-  if(!svg)return;
+  const svg=document.getElementById('svg-timeline');if(!svg)return;
   const W=svg.getBoundingClientRect().width||600;
   const H=110;const PAD={l:30,r:10,t:16,b:28};
   const maxV=Math.max(...counts,...agCounts,1);
@@ -1679,7 +1678,7 @@ function renderTimeline(){
     return`<line x1="${PAD.l}" y1="${y}" x2="${(W-PAD.r)}" y2="${y}" stroke="#E6EFEC" stroke-width="1"/><text x="${(PAD.l-4).toFixed(1)}" y="${(+y+3).toFixed(1)}" text-anchor="end" font-size="8" fill="#5A7268" font-family="Sora">${v}</text>`;
   }).join('');
   const p1=pts(counts), p2=pts(agCounts);
-  svg.innerHTML=`${gridY}${svgLine(p1,'#1B4D3E','#1B4D3E')}${svgLine(p2,'#2563EB','#2563EB')}${circles(p1,'#1B4D3E')}${circles(p2,'#2563EB')}${labels}
+  if(!svg)return;svg.innerHTML=`${gridY}${svgLine(p1,'#1B4D3E','#1B4D3E')}${svgLine(p2,'#2563EB','#2563EB')}${circles(p1,'#1B4D3E')}${circles(p2,'#2563EB')}${labels}
     <g><rect x="${PAD.l}" y="2" width="10" height="4" rx="2" fill="#1B4D3E"/><text x="${PAD.l+14}" y="7" font-size="9" fill="#5A7268" font-family="Sora">Serviços</text><rect x="${PAD.l+60}" y="2" width="10" height="4" rx="2" fill="#2563EB"/><text x="${PAD.l+74}" y="7" font-size="9" fill="#5A7268" font-family="Sora">Agendamentos</text></g>`;
 }
 
@@ -1765,7 +1764,7 @@ function buildPDFDoc(title, sections){
   const now=new Date();
   const dateStr=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
   const footer=`<div class="footer"><span>Segurança &amp; Trabalho — Sistema de Gestão</span><span>Gerado em ${dateStr}</span></div>`;
-  return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>${css}</style></head><body><div class="page"><h1>${title}</h1><div class="subtitle">Emitido em ${dateStr}</div>${sections.join('')}${footer}</div>
+  return`<!DOCTYPE html><!-- v7.0 --><html><head><meta charset="UTF-8"><title>${title}</title><style>${css}</style></head><body><div class="page"><h1>${title}</h1><div class="subtitle">Emitido em ${dateStr}</div>${sections.join('')}${footer}</div>
   <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
   <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
 </div>
@@ -1878,7 +1877,7 @@ function exportRelatorioGeralPDF(){
 
 // INIT
 function forceOffline(){
-  const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';
+  try{const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';}catch(e){}
   try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e){clients=[]}
   try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e){services=[]}
   try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e){agendamentos=[]}
@@ -1903,7 +1902,7 @@ function loadLocal(){
   
   // 1. Carrega dados locais e abre o sistema IMEDIATAMENTE
   loadLocal();
-  const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';
+  try{const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';}catch(e){}
   updateStats();renderClients();updateAlertBadge();
   showPage('dashboard');
 
