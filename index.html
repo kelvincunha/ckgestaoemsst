@@ -1,4 +1,4 @@
-<!DOCTYPE html><!-- v7.0 -->
+<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
@@ -207,14 +207,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 </style>
 </head>
 <body>
-
-<!-- LOADING OVERLAY -->
-<div id="loading-overlay" style="position:fixed;inset:0;background:var(--bg);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:9999;gap:16px">
-  <div style="width:52px;height:52px;background:var(--brand);border-radius:14px;display:flex;align-items:center;justify-content:center">
-    <svg width="28" height="28" viewBox="0 0 24 24" fill="white"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 4l5 2.18V11c0 3.5-2.33 6.79-5 7.93C9.33 17.79 7 14.5 7 11V7.18L12 5z"/></svg>
-  </div>
-  <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
-</div>
 <div class="layout">
   <!-- SIDEBAR -->
   <aside class="sidebar">
@@ -230,7 +222,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
       <button class="nav-item" id="nav-agenda" onclick="showPage('agenda')"><span class="ni">📅</span> Agenda</button>
 
       <div class="nav-section-label">Operacional</div>
-      <button class="nav-item" id="nav-documentos" onclick="showPage('documentos')"><span class="ni">📁</span> Documentos</button>
       <button class="nav-item" id="nav-tecnicos" onclick="showPage('tecnicos')"><span class="ni">👷</span> Técnicos</button>
       <button class="nav-item" id="nav-servicos" onclick="showPage('servicos')"><span class="ni">🔧</span> Serviços</button>
       <button class="nav-item" id="nav-alertas" onclick="showPage('alertas')"><span class="ni">🔔</span> Alertas <span id="alert-count" style="background:#C0392B;color:white;font-size:9px;padding:1px 5px;border-radius:8px;margin-left:4px;display:none"></span></button>
@@ -248,8 +239,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         <div class="topbar-title" id="topbar-title">Dashboard</div>
         <div class="topbar-subtitle" id="topbar-subtitle">Visão geral do negócio</div>
       </div>
-      <div style="display:flex;align-items:center;gap:12px"><span id="sync-status" style="font-size:11px;font-weight:500;color:var(--muted)"></span></div>
-      <div class="topbar-actions" id="topbar-actions">
+      <span id="sync-status" style="font-size:11px;font-weight:500;color:var(--muted)"></span>
+      <span id="sync-status" style="font-size:11px;font-weight:500;color:var(--muted);margin-right:8px"></span><div class="topbar-actions" id="topbar-actions">
         <button class="btn-o btn-sm" onclick="showPage('clientes');openClientModal()">+ Cliente</button>
         <button class="btn-p btn-sm" onclick="showPage('agenda');openAgendModal()">+ Agendar</button>
       </div>
@@ -259,75 +250,57 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
 
       <!-- DASHBOARD -->
       <div id="page-dashboard">
-        <!-- Topbar actions -->
-        <div style="display:flex;justify-content:flex-end;margin-bottom:16px;gap:8px">
-          <button class="btn-o btn-sm" onclick="exportDashboardPDF()">📄 Exportar Dashboard PDF</button>
-          <button class="btn-o btn-sm" onclick="exportRelatorioGeralPDF()">📋 Relatório Geral PDF</button>
-        </div>
         <div class="kpi-grid" id="kpi-grid"></div>
-
-        <!-- Linha 1: gráfico linha do tempo (12m) + pizza serviços por status -->
-        <div class="dash-grid-wide" style="margin-bottom:16px">
+        <div class="dash-grid-wide">
+          <!-- Serviços por mês -->
           <div class="card">
             <div class="card-header">
-              <div class="card-title">📈 Evolução — Serviços nos últimos 12 meses</div>
+              <div class="card-title">📈 Serviços — últimos 6 meses</div>
             </div>
-            <div class="card-body" style="padding:16px 18px 8px">
-              <svg id="svg-timeline" width="100%" height="110" style="overflow:visible"></svg>
+            <div class="card-body">
+              <div class="month-bars" id="month-bars"></div>
             </div>
           </div>
+          <!-- Status clientes -->
           <div class="card">
-            <div class="card-header"><div class="card-title">🔵 Serviços por Status</div></div>
+            <div class="card-header"><div class="card-title">🏢 Status dos Clientes</div></div>
             <div class="card-body">
               <div class="donut-wrap">
-                <svg width="100" height="100" viewBox="0 0 100 100" id="donut-status-svg"></svg>
-                <div id="donut-status-legend"></div>
+                <svg class="donut-svg" width="90" height="90" viewBox="0 0 90 90" id="donut-svg"></svg>
+                <div class="donut-legend" id="donut-legend"></div>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- Linha 2: pizza clientes segmento + barras NRs -->
-        <div class="dash-grid" style="margin-bottom:16px">
-          <div class="card">
-            <div class="card-header"><div class="card-title">🏭 Clientes por Segmento</div></div>
-            <div class="card-body">
-              <div style="display:flex;align-items:center;gap:16px">
-                <svg width="120" height="120" viewBox="0 0 120 120" id="donut-segmento-svg" style="flex-shrink:0"></svg>
-                <div id="donut-segmento-legend" style="flex:1"></div>
-              </div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-header"><div class="card-title">📋 NRs mais trabalhadas</div></div>
-            <div class="card-body" id="dash-nrs-chart"></div>
-          </div>
-        </div>
-
-        <!-- Linha 3: agendamentos + alertas -->
-        <div class="dash-grid" style="margin-bottom:16px">
+        <div class="dash-grid">
+          <!-- Próximos agendamentos -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">📅 Próximos Agendamentos</div>
               <button class="btn-o btn-sm" onclick="showPage('agenda')">Ver todos</button>
             </div>
-            <div class="card-body"><div id="dash-upcoming"></div></div>
+            <div class="card-body">
+              <div id="dash-upcoming"></div>
+            </div>
           </div>
+          <!-- Alertas de vencimento -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">⚠️ Vencimentos Críticos</div>
               <button class="btn-o btn-sm" onclick="showPage('alertas')">Ver todos</button>
             </div>
-            <div class="card-body"><div id="dash-alerts"></div></div>
+            <div class="card-body">
+              <div id="dash-alerts"></div>
+            </div>
           </div>
         </div>
-
-        <!-- Linha 4: serviços + clientes -->
         <div class="dash-grid">
+          <!-- Tipos de serviço mais realizados -->
           <div class="card">
             <div class="card-header"><div class="card-title">🔧 Serviços Mais Realizados</div></div>
             <div class="card-body" id="dash-service-types"></div>
           </div>
+          <!-- Clientes recentes / ativos -->
           <div class="card">
             <div class="card-header">
               <div class="card-title">👥 Clientes Ativos</div>
@@ -359,7 +332,7 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
           <button class="btn-o btn-sm" onclick="showPage('clientes')">← Voltar</button>
           <h2 id="d-name" style="font-size:16px;font-weight:700"></h2>
           <button class="btn-o btn-sm" onclick="exportClientXLSX()">📥 Excel</button>
-          <button class="btn-o btn-sm" onclick="exportClientePDF(currentClientId)">📄 PDF</button>
+          <button class="btn-o btn-sm" onclick="exportClientPDF()">📄 PDF</button>
         </div>
         <div class="dash-grid-3" style="margin-bottom:16px">
           <div class="card"><div class="card-body"><div class="fl">Responsável</div><div style="font-size:13px;font-weight:600;margin-top:4px" id="d-resp"></div></div></div>
@@ -375,11 +348,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
             <div class="card-header"><div class="card-title">🔧 Serviços</div><button class="btn-o btn-sm" onclick="openServiceModal(currentClientId)">+ Serviço</button></div>
             <div id="service-list"></div>
           </div>
-        </div>
-        <!-- Documentos do cliente -->
-        <div class="card table-wrap" style="margin-top:16px">
-          <div class="card-header"><div class="card-title">📁 Documentos</div><button class="btn-p btn-sm" onclick="openDocModal(null,currentClientId)">+ Documento</button></div>
-          <div id="client-doc-list"></div>
         </div>
       </div>
 
@@ -446,80 +414,6 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
         </div>
         <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr)" id="rep-stats"></div>
         <div id="rep-content"></div>
-      </div>
-
-
-      <!-- TÉCNICOS -->
-      <div id="page-tecnicos" style="display:none">
-        <div class="toolbar">
-          <div class="search-wrap"><span class="si">🔍</span><input type="text" id="sc-tec" placeholder="Buscar técnico, especialidade..." oninput="renderTecnicos()"></div>
-          <select class="fsel" id="fc-tec-status" onchange="renderTecnicos()"><option value="">Todos</option><option>Ativo</option><option>Inativo</option></select>
-          <button class="btn-p" onclick="openTecModal()">+ Técnico</button>
-        </div>
-        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:20px" id="tec-kpis"></div>
-        <div id="tec-cards-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:16px;margin-bottom:20px"></div>
-        <div class="card table-wrap">
-          <div class="card-header">
-            <div class="card-title">📅 Próximos Agendamentos por Técnico</div>
-            <select class="fsel" id="fc-tec-filter" onchange="renderTecAgenda()" style="font-size:11px;padding:5px 8px"><option value="">Todos os técnicos</option></select>
-          </div>
-          <div class="t-head" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr 1fr"><div class="th">Técnico</div><div class="th">Cliente</div><div class="th">Serviço</div><div class="th">Data/Hora</div><div class="th">Status</div></div>
-          <div id="tec-agenda-list"></div>
-        </div>
-      </div>
-
-      <!-- DETALHE TÉCNICO -->
-      <div id="page-tec-detail" style="display:none">
-        <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;flex-wrap:wrap">
-          <button class="btn-o btn-sm" onclick="showPage('tecnicos')">← Voltar</button>
-          <div style="display:flex;align-items:center;gap:12px">
-            <div id="td-avatar" style="width:48px;height:48px;border-radius:12px;background:var(--brand-pale);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:var(--brand)"></div>
-            <div><div id="td-name" style="font-size:18px;font-weight:700"></div><div id="td-cargo" style="font-size:12px;color:var(--muted)"></div></div>
-          </div>
-        </div>
-        <div class="dash-grid-3" style="margin-bottom:16px">
-          <div class="card"><div class="card-body"><div class="fl">Telefone</div><div style="font-size:13px;font-weight:600;margin-top:4px" id="td-tel"></div></div></div>
-          <div class="card"><div class="card-body"><div class="fl">E-mail</div><div style="font-size:13px;font-weight:600;margin-top:4px" id="td-email"></div></div></div>
-          <div class="card"><div class="card-body"><div class="fl">Status</div><div style="font-size:13px;font-weight:600;margin-top:4px" id="td-status-badge"></div></div></div>
-        </div>
-        <div class="dash-grid" style="margin-bottom:16px">
-          <div class="card"><div class="card-body"><div class="fl">Especialidades</div><div id="td-especialidades" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:6px"></div></div></div>
-          <div class="card"><div class="card-body"><div class="fl">Observações</div><div id="td-obs" style="font-size:13px;margin-top:4px;color:var(--muted)"></div></div></div>
-        </div>
-        <div class="kpi-grid" style="grid-template-columns:repeat(4,1fr);margin-bottom:16px" id="td-stats"></div>
-        <div class="card table-wrap" style="margin-bottom:16px">
-          <div class="card-header"><div class="card-title">📅 Agendamentos</div></div>
-          <div class="t-head" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr"><div class="th">Cliente</div><div class="th">Serviço</div><div class="th">Data/Hora</div><div class="th">Status</div></div>
-          <div id="td-agend-list"></div>
-        </div>
-        <div class="card table-wrap">
-          <div class="card-header"><div class="card-title">🔧 Serviços Realizados</div></div>
-          <div class="t-head" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr"><div class="th">Cliente</div><div class="th">Serviço</div><div class="th">Data</div><div class="th">Status</div></div>
-          <div id="td-svc-list"></div>
-        </div>
-      </div>
-
-
-      <!-- DOCUMENTOS -->
-      <div id="page-documentos" style="display:none">
-        <!-- KPIs -->
-        <div class="kpi-grid" style="grid-template-columns:repeat(5,1fr);margin-bottom:20px" id="doc-kpis"></div>
-        <div class="toolbar">
-          <div class="search-wrap"><span class="si">🔍</span><input type="text" id="sc-doc" placeholder="Buscar documento, cliente ou tipo..." oninput="renderDocs()"></div>
-          <select class="fsel" id="fc-doc-tipo" onchange="renderDocs()">
-            <option value="">Todos os tipos</option>
-            <option>PPRA</option><option>PCMSO</option><option>PGR</option><option>LTCAT</option>
-            <option>Laudo de Insalubridade</option><option>Laudo de Periculosidade</option>
-            <option>ASO</option><option>APR</option><option>Mapa de Risco</option>
-            <option>CIPA</option><option>Treinamento</option><option>Contrato</option><option>Outro</option>
-          </select>
-          <select class="fsel" id="fc-doc-status" onchange="renderDocs()">
-            <option value="">Todos</option><option>Válido</option><option>Vencido</option><option>Sem validade</option>
-          </select>
-          <button class="btn-p" onclick="openDocModal()">+ Documento</button>
-        </div>
-        <!-- Grid de documentos -->
-        <div id="doc-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px"></div>
       </div>
 
     </div><!-- /page-content -->
@@ -589,129 +483,8 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:1
   </div>
 </div>
 
-
-<!-- MODAL TÉCNICO -->
-<div class="mo" id="modal-tec" style="display:none">
-  <div class="modal">
-    <div class="mt" id="mt-title">Novo Técnico</div>
-    <div class="fg">
-      <div class="fgp ff"><label class="fl">Nome Completo</label><input class="fi" id="mt-nome" placeholder="Ex: Carlos Eduardo Silva"></div>
-      <div class="fgp"><label class="fl">Cargo / Função</label>
-        <select class="fse" id="mt-cargo">
-          <option>Técnico de Segurança do Trabalho</option>
-          <option>Engenheiro de Segurança do Trabalho</option>
-          <option>Médico do Trabalho</option>
-          <option>Enfermeiro do Trabalho</option>
-          <option>Auxiliar de Segurança</option>
-          <option>Consultor SST</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="fgp"><label class="fl">Registro Profissional</label><input class="fi" id="mt-registro" placeholder="Ex: MTE 12345 / CREA 98765"></div>
-      <div class="fgp"><label class="fl">Telefone</label><input class="fi" id="mt-tel" placeholder="(84) 99999-0000"></div>
-      <div class="fgp"><label class="fl">E-mail</label><input class="fi" id="mt-email" type="email" placeholder="tecnico@empresa.com"></div>
-      <div class="fgp"><label class="fl">Status</label>
-        <select class="fse" id="mt-status"><option>Ativo</option><option>Inativo</option></select>
-      </div>
-      <div class="fgp ff"><label class="fl">Especialidades (selecione)</label>
-        <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:4px" id="esp-chips">
-          <span class="nr-chip" data-esp="NR-06 (EPI)">NR-06</span>
-          <span class="nr-chip" data-esp="NR-07 (PCMSO)">NR-07</span>
-          <span class="nr-chip" data-esp="NR-09 (PPRA)">NR-09</span>
-          <span class="nr-chip" data-esp="NR-10 (Elétrica)">NR-10</span>
-          <span class="nr-chip" data-esp="NR-12 (Máquinas)">NR-12</span>
-          <span class="nr-chip" data-esp="NR-15 (Insalubridade)">NR-15</span>
-          <span class="nr-chip" data-esp="NR-16 (Periculosidade)">NR-16</span>
-          <span class="nr-chip" data-esp="NR-18 (Construção)">NR-18</span>
-          <span class="nr-chip" data-esp="NR-20 (Inflamáveis)">NR-20</span>
-          <span class="nr-chip" data-esp="NR-23 (Incêndio)">NR-23</span>
-          <span class="nr-chip" data-esp="NR-33 (Espaço Confinado)">NR-33</span>
-          <span class="nr-chip" data-esp="NR-35 (Altura)">NR-35</span>
-          <span class="nr-chip" data-esp="PPRA">PPRA</span>
-          <span class="nr-chip" data-esp="PCMSO">PCMSO</span>
-          <span class="nr-chip" data-esp="PGR">PGR</span>
-          <span class="nr-chip" data-esp="LTCAT">LTCAT</span>
-          <span class="nr-chip" data-esp="Brigada de Incêndio">Brigada</span>
-          <span class="nr-chip" data-esp="SIPAT">SIPAT</span>
-          <span class="nr-chip" data-esp="ASO">ASO</span>
-          <span class="nr-chip" data-esp="CIPA">CIPA</span>
-        </div>
-      </div>
-      <div class="fgp ff"><label class="fl">Observações</label><textarea class="fta" id="mt-obs" placeholder="Certificações, disponibilidade, notas..."></textarea></div>
-    </div>
-    <div class="mf"><button class="bc" onclick="closeModals()">Cancelar</button><button class="btn-p" onclick="saveTec()">Salvar</button></div>
-  </div>
-</div>
-
-
-<!-- MODAL DOCUMENTO -->
-<div class="mo" id="modal-doc" style="display:none">
-  <div class="modal" style="max-width:520px">
-    <div class="mt" id="mdoc-title">Novo Documento</div>
-    <div class="fg">
-      <div class="fgp ff"><label class="fl">Cliente</label><select class="fse" id="mdoc-client"></select></div>
-      <div class="fgp ff"><label class="fl">Tipo de Documento</label>
-        <select class="fse" id="mdoc-tipo" onchange="onDocTipoChange()">
-          <option>PPRA – Prevenção de Riscos Ambientais</option>
-          <option>PCMSO – Controle Médico de Saúde Ocupacional</option>
-          <option>PGR – Gerenciamento de Riscos</option>
-          <option>LTCAT – Laudo Técnico do Ambiente de Trabalho</option>
-          <option>Laudo de Insalubridade</option>
-          <option>Laudo de Periculosidade</option>
-          <option>ASO – Atestado de Saúde Ocupacional</option>
-          <option>APR – Análise Preliminar de Risco</option>
-          <option>Mapa de Risco</option>
-          <option>CIPA</option>
-          <option>Certificado de Treinamento NR-06</option>
-          <option>Certificado de Treinamento NR-10</option>
-          <option>Certificado de Treinamento NR-12</option>
-          <option>Certificado de Treinamento NR-18</option>
-          <option>Certificado de Treinamento NR-20</option>
-          <option>Certificado de Treinamento NR-23</option>
-          <option>Certificado de Treinamento NR-33</option>
-          <option>Certificado de Treinamento NR-35</option>
-          <option>Contrato de Prestação de Serviços</option>
-          <option>Relatório de Inspeção</option>
-          <option>Outro</option>
-        </select>
-      </div>
-      <div class="fgp"><label class="fl">Número / Revisão</label><input class="fi" id="mdoc-num" placeholder="Ex: Rev.03 / 2025"></div>
-      <div class="fgp"><label class="fl">Técnico Responsável</label><select class="fse" id="mdoc-tec"></select></div>
-      <div class="fgp"><label class="fl">Data de Emissão</label><input class="fi" id="mdoc-emissao" type="date"></div>
-      <div class="fgp"><label class="fl">Data de Validade</label><input class="fi" id="mdoc-validade" type="date"></div>
-      <div class="fgp ff"><label class="fl">Arquivo (PDF, imagem ou doc)</label>
-        <div id="mdoc-dropzone" style="border:2px dashed var(--border);border-radius:10px;padding:20px;text-align:center;cursor:pointer;transition:all .15s;background:var(--bg)" onclick="document.getElementById('mdoc-file').click()" ondragover="event.preventDefault();this.style.borderColor='var(--brand)';this.style.background='var(--brand-pale)'" ondragleave="this.style.borderColor='var(--border)';this.style.background='var(--bg)'" ondrop="handleDrop(event)">
-          <div style="font-size:24px;margin-bottom:6px">📎</div>
-          <div id="mdoc-file-label" style="font-size:12px;color:var(--muted)">Arraste um arquivo ou clique para selecionar</div>
-          <div style="font-size:10px;color:var(--muted);margin-top:4px">PDF, imagem, Word, Excel — máx. 5MB</div>
-        </div>
-        <input type="file" id="mdoc-file" style="display:none" accept=".pdf,.doc,.docx,.xls,.xlsx,.png,.jpg,.jpeg" onchange="handleFileSelect(this)">
-      </div>
-      <div class="fgp ff"><label class="fl">Observações</label><textarea class="fta" id="mdoc-obs" placeholder="Notas sobre o documento..."></textarea></div>
-    </div>
-    <div class="mf"><button class="bc" onclick="closeModals()">Cancelar</button><button class="btn-p" onclick="saveDoc()">Salvar</button></div>
-  </div>
-</div>
-
-<!-- MODAL VISUALIZADOR -->
-<div class="mo" id="modal-viewer" style="display:none">
-  <div class="modal" style="max-width:700px;padding:0;overflow:hidden">
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--border)">
-      <div>
-        <div id="viewer-title" style="font-size:14px;font-weight:700"></div>
-        <div id="viewer-sub" style="font-size:11px;color:var(--muted)"></div>
-      </div>
-      <div style="display:flex;gap:8px">
-        <button id="viewer-download" class="btn-o btn-sm">⬇️ Baixar</button>
-        <button class="bc" style="padding:5px 12px;font-size:12px" onclick="closeModals()">✕ Fechar</button>
-      </div>
-    </div>
-    <div id="viewer-body" style="padding:20px;max-height:60vh;overflow-y:auto;background:var(--bg)"></div>
-  </div>
-</div>
-
 <script>
-let clients=[],services=[],agendamentos=[],tecnicos=[],documentos=[];
+let clients=[],services=[],agendamentos=[];
 let editCId=null,editSId=null,editAId=null,currentClientId=null;
 let calYear=new Date().getFullYear(),calMonth=new Date().getMonth();
 let repYear=new Date().getFullYear(),repMonth=new Date().getMonth();
@@ -719,120 +492,54 @@ const MESES=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agos
 const MESES_CURTOS=['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const NR_MAP={'PPRA':['NR-09','NR-15'],'PCMSO':['NR-07'],'PGR':['NR-01'],'LTCAT':['NR-15'],'BRIGADA':['NR-23'],'SIPAT':['NR-05'],'NR-06':['NR-06'],'NR-10':['NR-10'],'NR-12':['NR-12'],'NR-18':['NR-18'],'NR-20':['NR-20'],'NR-23':['NR-23'],'NR-33':['NR-33'],'NR-35':['NR-35'],'ASO':['NR-07'],'CIPA':['NR-05']};
 
-// ===== SUPABASE CONFIG =====
-const SUPA_URL = 'https://yzrpdzirpamqpegpkaim.supabase.co';
-const SUPA_KEY_RAW = 'sb_publishable_LjP1nm4ZJvxwIzc6KkPJCg_7d7y_Uka';
-// NOTE: key will auto-detect below
-const supa = supabase.createClient(SUPA_URL, SUPA_KEY_RAW);
-// Sync status indicator
-function setSyncStatus(status){
-  const el=document.getElementById('sync-status');
-  if(!el){console.log('Status:',status);return;}
-  const map={syncing:'⟳ Sincronizando...',ok:'☁️ Salvo',error:'⚠️ Erro ao salvar'};
-  const col={syncing:'#F5A623',ok:'#2E7D5E',error:'#C0392B'};
-  el.textContent=map[status]||'';
-  el.style.color=col[status]||'var(--muted)';
-}
+// ===== SUPABASE =====
+const SUPA_URL='https://yzrpdzirpamqpegpkaim.supabase.co';
+const SUPA_KEY='sb_publishable_LjP1nm4ZJvxwIzc6KkPJCg_7d7y_Uka';
+const supa=supabase.createClient(SUPA_URL,SUPA_KEY);
 
-async function persistTable(table, records){
-  if(!records.length){
-    await supa.from(table).delete().neq('id','__none__');
-    return;
-  }
-  const rows=records.map(r=>({id:r.id, dados:r}));
-  const {error}=await supa.from(table).upsert(rows,{onConflict:'id'});
-  if(error)throw error;
-  // delete removed records
-  const ids=records.map(r=>r.id);
-  await supa.from(table).delete().not('id','in',`(${ids.map(id=>`"${id}"`).join(',')})`);
+function setSyncStatus(s){
+  const el=document.getElementById('sync-status');
+  if(!el)return;
+  const map={syncing:'⟳ Sincronizando...',ok:'☁️ Salvo',error:'📴 Offline'};
+  const col={syncing:'#F5A623',ok:'#2E7D5E',error:'#C0392B'};
+  el.textContent=map[s]||s;el.style.color=col[s]||'var(--muted)';
 }
 
 async function persist(){
+  localStorage.setItem('st_clients_v5',JSON.stringify(clients));
+  localStorage.setItem('st_services_v5',JSON.stringify(services));
+  localStorage.setItem('st_agend_v5',JSON.stringify(agendamentos));
+  localStorage.setItem('st_tec_v5',JSON.stringify(tecnicos));
   setSyncStatus('syncing');
   try{
-    // For documentos, strip fileData from cloud (store locally only)
-    const docsCloud=documentos.map(d=>{const{fileData,...rest}=d;return{...rest,hasFile:!!fileData,fileName:d.fileName||''}});
-    await Promise.all([
-      persistTable('clientes', clients),
-      persistTable('servicos', services),
-      persistTable('agendamentos', agendamentos),
-      persistTable('tecnicos', tecnicos),
-      persistTable('documentos', docsCloud),
-    ]);
-    // Still save fileData locally for viewing
-    localStorage.setItem('st_doc_files', JSON.stringify(documentos.map(d=>({id:d.id,fileData:d.fileData||null,fileMime:d.fileMime||null,fileName:d.fileName||null}))));
+    const up=async(t,r)=>{if(!r.length)return;const {error}=await supa.from(t).upsert(r.map(x=>({id:x.id,dados:x})),{onConflict:'id'});if(error)throw error;};
+    await Promise.all([up('clientes',clients),up('servicos',services),up('agendamentos',agendamentos),up('tecnicos',tecnicos)]);
     setSyncStatus('ok');
-  } catch(e){
-    console.error('Sync error',e);
-    setSyncStatus('error');
-    // fallback to localStorage
-    localStorage.setItem('st_clients_v5',JSON.stringify(clients));
-    localStorage.setItem('st_services_v5',JSON.stringify(services));
-    localStorage.setItem('st_agend_v5',JSON.stringify(agendamentos));
-    localStorage.setItem('st_tec_v5',JSON.stringify(tecnicos));
-  }
+  }catch(e){console.warn('Sync failed:',e.message);setSyncStatus('error');}
 }
+
+function loadLocal(){
+  try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e){clients=[]}
+  try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e){services=[]}
+  try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e){agendamentos=[]}
+  try{tecnicos=JSON.parse(localStorage.getItem('st_tec_v5')||'[]')}catch(e){tecnicos=[]}
+}
+
 async function loadData(){
-  setSyncStatus('syncing');
-  
-  // Test connection first
-  const loadOverlay = document.getElementById('loading-overlay');
-  const loadMsg = loadOverlay ? loadOverlay.querySelector('span') : null;
-
+  loadLocal();
   try{
-    // Test with timeout of 8 seconds
-    const timeout = new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000));
-    
-    const fetchAll = Promise.all([
-      supa.from('clientes').select('dados'),
-      supa.from('servicos').select('dados'),
-      supa.from('agendamentos').select('dados'),
-      supa.from('tecnicos').select('dados'),
-      supa.from('documentos').select('dados'),
-    ]);
-
-    const [rc,rs,ra,rt,rd] = await Promise.race([fetchAll, timeout]);
-
-    // Check for auth errors
-    if(rc.error){
-      console.error('Supabase error:', rc.error);
-      throw new Error(rc.error.message);
-    }
-
-    clients=(rc.data||[]).map(r=>r.dados).filter(Boolean);
-    services=(rs.data||[]).map(r=>r.dados).filter(Boolean);
-    agendamentos=(ra.data||[]).map(r=>r.dados).filter(Boolean);
-    tecnicos=(rt.data||[]).map(r=>r.dados).filter(Boolean);
-    documentos=(rd.data||[]).map(r=>r.dados).filter(Boolean);
-
-    // Restore local file data
-    try{
-      const files=JSON.parse(localStorage.getItem('st_doc_files')||'[]');
-      documentos=documentos.map(d=>{
-        const f=files.find(x=>x.id===d.id);
-        return f?{...d,fileData:f.fileData,fileMime:f.fileMime,fileName:f.fileName||d.fileName}:d;
-      });
-    }catch(e){}
-
+    const t=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),8000));
+    const [rc,rs,ra,rt]=await Promise.race([Promise.all([supa.from('clientes').select('dados'),supa.from('servicos').select('dados'),supa.from('agendamentos').select('dados'),supa.from('tecnicos').select('dados')]),t]);
+    if(rc.error)throw new Error(rc.error.message);
+    const p=(d)=>(d||[]).map(r=>r.dados).filter(Boolean);
+    const cc=p(rc.data),cs=p(rs.data),ca=p(ra.data),ct=p(rt.data);
+    if(cc.length)clients=cc;
+    if(cs.length)services=cs;
+    if(ca.length)agendamentos=ca;
+    if(ct.length)tecnicos=ct;
     setSyncStatus('ok');
-
-    // Migrate localStorage data if cloud is empty
-    if(!clients.length){try{const r=localStorage.getItem('st_clients_v5');if(r){clients=JSON.parse(r);}}catch(e){}}
-    if(!services.length){try{const r=localStorage.getItem('st_services_v5');if(r){services=JSON.parse(r);}}catch(e){}}
-    if(!agendamentos.length){try{const r=localStorage.getItem('st_agend_v5');if(r){agendamentos=JSON.parse(r);}}catch(e){}}
-    if(!tecnicos.length){try{const r=localStorage.getItem('st_tec_v5');if(r){tecnicos=JSON.parse(r);}}catch(e){}}
-
-  } catch(e){
-    console.error('Load error:', e.message);
-    setSyncStatus('error');
-    if(loadMsg) loadMsg.textContent = '⚠️ Erro: ' + e.message + ' — usando dados locais';
-    // fallback localStorage — system still works offline
-    try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e2){clients=[]}
-    try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e2){services=[]}
-    try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e2){agendamentos=[]}
-    try{tecnicos=JSON.parse(localStorage.getItem('st_tec_v5')||'[]')}catch(e2){tecnicos=[]}
-    try{documentos=JSON.parse(localStorage.getItem('st_doc_v5')||'[]')}catch(e2){documentos=[]}
-  }
+    if(!cc.length&&clients.length)persist();
+  }catch(e){console.warn('Cloud failed:',e.message);setSyncStatus('error');}
 }
 
 const tod=()=>new Date().toISOString().split('T')[0];
@@ -851,7 +558,7 @@ function updateSidebarDate(){
 
 // SHOW PAGE
 function showPage(page){
-  const pages=['dashboard','clientes','detail','agenda','tecnicos','tec-detail','documentos','servicos','alertas','relatorio'];
+  const pages=['dashboard','clientes','detail','agenda','servicos','alertas','relatorio'];
   pages.forEach(p=>document.getElementById('page-'+p).style.display='none');
   document.getElementById('page-'+page).style.display='';
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
@@ -859,13 +566,12 @@ function showPage(page){
   if(nb)nb.classList.add('active');
   else document.getElementById('nav-clientes').classList.add('active');
 
-  const titles={documentos:['Documentos','Repositório de documentos por cliente'],tecnicos:['Técnicos','Equipe técnica e agenda por profissional'],'tec-detail':['Técnico','Histórico e agendamentos'],dashboard:['Dashboard','Visão geral do negócio'],clientes:['Clientes','Gerenciar base de clientes'],detail:['Detalhe do Cliente','Serviços e agendamentos'],agenda:['Agenda','Calendário de visitas e serviços'],servicos:['Serviços','Histórico de serviços prestados'],alertas:['Alertas','Vencimentos e compromissos'],relatorio:['Relatório Mensal','Análise de desempenho']};
+  const titles={dashboard:['Dashboard','Visão geral do negócio'],clientes:['Clientes','Gerenciar base de clientes'],detail:['Detalhe do Cliente','Serviços e agendamentos'],agenda:['Agenda','Calendário de visitas e serviços'],servicos:['Serviços','Histórico de serviços prestados'],alertas:['Alertas','Vencimentos e compromissos'],relatorio:['Relatório Mensal','Análise de desempenho']};
   const t=titles[page]||['',''];
   document.getElementById('topbar-title').textContent=t[0];
   document.getElementById('topbar-subtitle').textContent=t[1];
 
   if(page==='dashboard')renderDashboard();
-  if(page==='documentos')renderDocs();
   if(page==='clientes')renderClients();
   if(page==='agenda'){renderCalendar();renderUpcoming()}
   if(page==='alertas')renderAlertas();
@@ -880,17 +586,13 @@ function renderDashboard(){
   const futA=agendamentos.filter(a=>a.data>=tod()&&a.status!=='Cancelado'&&a.status!=='Concluído').length;
   const hoje=agendamentos.filter(a=>a.data===tod()&&a.status!=='Cancelado').length;
 
-  (()=>{const __e=document.getElementById('kpi-grid');if(__e)__e.innerHTML=`})();
+  document.getElementById('kpi-grid').innerHTML=`
     <div class="kpi-card"><div class="kpi-icon">👥</div><div class="kpi-value">${clients.length}</div><div class="kpi-label">Total de Clientes</div><div class="kpi-sub">${clients.filter(c=>c.status==='Ativo').length} ativos</div></div>
     <div class="kpi-card info"><div class="kpi-icon">📅</div><div class="kpi-value">${futA}</div><div class="kpi-label">Agendamentos Futuros</div><div class="kpi-sub">${hoje} hoje</div></div>
     <div class="kpi-card accent"><div class="kpi-icon">🔧</div><div class="kpi-value">${services.length}</div><div class="kpi-label">Serviços Registrados</div><div class="kpi-sub">${services.filter(s=>s.status==='Concluído').length} concluídos</div></div>
     <div class="kpi-card warn"><div class="kpi-icon">⏰</div><div class="kpi-value">${breve}</div><div class="kpi-label">Vencem em 30 dias</div><div class="kpi-sub">Documentos</div></div>
     <div class="kpi-card danger"><div class="kpi-icon">🔴</div><div class="kpi-value">${venc}</div><div class="kpi-label">Documentos Vencidos</div><div class="kpi-sub">Atenção urgente</div></div>`;
 
-  renderTimeline();
-  renderDonutStatus();
-  renderDonutSegmento();
-  renderNRsChart();
   renderMonthBars();
   renderDonut();
   renderDashUpcoming();
@@ -909,7 +611,7 @@ function renderMonthBars(){
   }
   const counts=months.map(m=>services.filter(s=>s.data&&s.data.startsWith(m.ym)).length);
   const max=Math.max(...counts,1);
-  const _mb=document.getElementById('month-bars');if(!_mb)return;_mb.innerHTML=counts.map((c,i)=>`
+  document.getElementById('month-bars').innerHTML=counts.map((c,i)=>`
     <div class="month-bar-wrap">
       <div class="month-bar-count">${c||''}</div>
       <div class="month-bar" style="height:${Math.max(4,(c/max)*72)}px" title="${months[i].label}: ${c} serviços"></div>
@@ -1047,7 +749,7 @@ function openDetail(id){
   document.getElementById('d-resp').textContent=c.responsavel||'—';
   document.getElementById('d-tel').textContent=c.telefone||'—';
   document.getElementById('d-seg').textContent=c.segmento||'—';
-  showPage('detail');renderClientAgend(id);renderClientServices(id);renderClientDocs(id);
+  showPage('detail');renderClientAgend(id);renderClientServices(id);
 }
 
 function renderClientAgend(cid){
@@ -1167,7 +869,7 @@ function renderRelatorio(){
   const ym=`${repYear}-${String(repMonth+1).padStart(2,'0')}`;
   const ms=services.filter(s=>s.data&&s.data.startsWith(ym));
   const ma=agendamentos.filter(a=>a.data&&a.data.startsWith(ym));
-  (()=>{const __e=document.getElementById('rep-stats');if(__e)__e.innerHTML=`})();
+  document.getElementById('rep-stats').innerHTML=`
     <div class="kpi-card"><div class="kpi-icon">🔧</div><div class="kpi-value">${ms.length}</div><div class="kpi-label">Serviços</div></div>
     <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" style="color:var(--brand-light)">${ms.filter(s=>s.status==='Concluído').length}</div><div class="kpi-label">Concluídos</div></div>
     <div class="kpi-card accent"><div class="kpi-icon">📅</div><div class="kpi-value">${ma.length}</div><div class="kpi-label">Agendamentos</div></div>
@@ -1215,7 +917,6 @@ function onSvcTypeChange(){
   if(k)NR_MAP[k].forEach(nr=>{const c=document.querySelector(`.nr-chip[data-nr="${nr}"]`);if(c)c.classList.add('selected')});
 }
 document.querySelectorAll('.nr-chip').forEach(ch=>ch.addEventListener('click',()=>ch.classList.toggle('selected')));
-document.querySelectorAll('#esp-chips .nr-chip').forEach(ch=>ch.addEventListener('click',()=>ch.classList.toggle('selected')));
 function saveService(){
   const tipo=document.getElementById('ms-tipo').value;const nrs=[...document.querySelectorAll('.nr-chip.selected')].map(c=>c.dataset.nr);
   const d={id:editSId||Date.now().toString(),clientId:currentClientId,tipo,nrs,data:document.getElementById('ms-data').value,validade:document.getElementById('ms-val').value,status:document.getElementById('ms-status').value,tecnico:document.getElementById('ms-tec').value.trim(),obs:document.getElementById('ms-obs').value.trim()};
@@ -1285,676 +986,23 @@ function exportReportPDF(){
   const html=pdfH(`Relatório ${MESES[repMonth]} ${repYear}`,`<h2>Relatório ${MESES[repMonth]} ${repYear}</h2><h3 style="margin-top:16px">Agendamentos</h3><table><tr><th>Empresa</th><th>Tipo</th><th>Data</th><th>Status</th></tr>${ma.map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${a.tipo}</td><td>${fD(a.data)}</td><td>${a.status}</td></tr>`}).join('')}</table><h3 style="margin-top:16px">Serviços</h3><table><tr><th>Empresa</th><th>Tipo</th><th>Data</th><th>Status</th></tr>${ms.map(s=>{const c=clients.find(x=>x.id===s.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${s.tipo}</td><td>${fD(s.data)}</td><td>${s.status}</td></tr>`}).join('')}</table>`);
   printH(html);
 }
-function pdfH(title,body){return`<!DOCTYPE html><!-- v7.0 --><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:30px}h2,h3{color:#1B4D3E}p{margin:4px 0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#1B4D3E;color:white;padding:6px 8px;text-align:left;font-size:11px}td{padding:5px 8px;border-bottom:.5px solid #ddd;font-size:11px}tr:nth-child(even) td{background:#f7f7f7}</style></head><body>${body}
-  <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-</div>
-</body></html>`}
+function pdfH(title,body){return`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;font-size:12px;padding:30px}h2,h3{color:#1B4D3E}p{margin:4px 0}table{width:100%;border-collapse:collapse;margin-top:8px}th{background:#1B4D3E;color:white;padding:6px 8px;text-align:left;font-size:11px}td{padding:5px 8px;border-bottom:.5px solid #ddd;font-size:11px}tr:nth-child(even) td{background:#f7f7f7}</style></head><body>${body}</body></html>`}
 function printH(html){const w=window.open('','_blank','width=900,height=700');w.document.write(html);w.document.close();setTimeout(()=>{w.focus();w.print()},400)}
 
-function closeModals(){['modal-client','modal-service','modal-agend','modal-tec','modal-doc','modal-viewer'].forEach(id=>document.getElementById(id).style.display='none')}
-['modal-client','modal-service','modal-agend','modal-tec','modal-doc','modal-viewer'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeModals()}));
-
-
-// ===== TÉCNICOS =====
-const tecColors=['#1B4D3E','#2E7D5E','#2563EB','#7C3AED','#E67E22','#C0392B','#0891B2','#059669'];
-function tecColor(id){const idx=tecnicos.findIndex(t=>t.id===id);return tecColors[idx%tecColors.length]||'#1B4D3E'}
-function tecInitials(n){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase()}
-
-function renderTecnicos(){
-  const q=(document.getElementById('sc-tec').value||'').toLowerCase();
-  const fs=document.getElementById('fc-tec-status').value;
-  const filtered=tecnicos.filter(t=>{
-    const m=!q||t.nome.toLowerCase().includes(q)||(t.cargo||'').toLowerCase().includes(q)||(t.especialidades||[]).join(' ').toLowerCase().includes(q);
-    return m&&(!fs||t.status===fs);
-  });
-  // KPIs
-  const ativos=tecnicos.filter(t=>t.status==='Ativo').length;
-  const totalAgend=tecnicos.reduce((sum,t)=>sum+agendamentos.filter(a=>(a.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&a.data>=tod()&&a.status!=='Cancelado').length,0);
-  const svcMes=tecnicos.reduce((sum,t)=>sum+services.filter(s=>{const ym=new Date().toISOString().slice(0,7);return(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&(s.data||'').startsWith(ym)}).length,0);
-  document.getElementById('tec-kpis').innerHTML=`
-    <div class="kpi-card"><div class="kpi-icon">👷</div><div class="kpi-value">${tecnicos.length}</div><div class="kpi-label">Total de Técnicos</div></div>
-    <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" style="color:var(--brand-light)">${ativos}</div><div class="kpi-label">Ativos</div></div>
-    <div class="kpi-card accent"><div class="kpi-icon">📅</div><div class="kpi-value">${totalAgend}</div><div class="kpi-label">Agendamentos Futuros</div></div>
-    <div class="kpi-card info"><div class="kpi-icon">🔧</div><div class="kpi-value">${svcMes}</div><div class="kpi-label">Serviços este mês</div></div>`;
-
-  // Cards
-  const grid=document.getElementById('tec-cards-grid');
-  if(!filtered.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1">Nenhum técnico cadastrado. Clique em + Técnico.</div>';
-  }else{
-    grid.innerHTML=filtered.map(t=>{
-      const color=tecColor(t.id);
-      const futA=agendamentos.filter(a=>(a.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&a.data>=tod()&&a.status!=='Cancelado').length;
-      const totSvc=services.filter(s=>(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()).length;
-      const esps=(t.especialidades||[]).slice(0,3);
-      return`<div class="card" style="cursor:pointer;transition:transform .15s,box-shadow .15s" onmouseover="this.style.transform='translateY(-3px)';this.style.boxShadow='var(--shadow-lg)'" onmouseout="this.style.transform='';this.style.boxShadow=''" onclick="openTecDetail('${t.id}')">
-        <div style="background:${color};padding:20px;display:flex;align-items:center;gap:14px">
-          <div style="width:48px;height:48px;border-radius:12px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:white;flex-shrink:0">${tecInitials(t.nome)}</div>
-          <div style="flex:1;min-width:0">
-            <div style="font-size:14px;font-weight:700;color:white;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${t.nome}</div>
-            <div style="font-size:11px;color:rgba(255,255,255,.7);margin-top:2px">${t.cargo||'—'}</div>
-          </div>
-          <span style="background:${t.status==='Ativo'?'rgba(255,255,255,.25)':'rgba(255,0,0,.3)'};color:white;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px">${t.status}</span>
-        </div>
-        <div style="padding:14px 16px">
-          <div style="display:flex;gap:16px;margin-bottom:10px">
-            <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--brand)">${futA}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Agend.</div></div>
-            <div style="text-align:center"><div style="font-size:18px;font-weight:700;color:var(--brand)">${totSvc}</div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Serviços</div></div>
-            ${t.registro?`<div style="flex:1"><div style="font-size:10px;color:var(--muted)">Registro</div><div style="font-size:11px;font-weight:600;font-family:var(--mono)">${t.registro}</div></div>`:''}
-          </div>
-          <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px">
-            ${esps.map(e=>`<span style="background:var(--brand-pale);color:var(--brand);font-size:10px;padding:2px 8px;border-radius:10px;font-weight:500">${e}</span>`).join('')}
-            ${(t.especialidades||[]).length>3?`<span style="background:var(--bg2);color:var(--muted);font-size:10px;padding:2px 8px;border-radius:10px">+${(t.especialidades||[]).length-3}</span>`:''}
-          </div>
-          <div style="display:flex;gap:6px">
-            ${t.telefone?`<a href="tel:${t.telefone}" onclick="event.stopPropagation()" style="flex:1;background:var(--brand-pale);color:var(--brand);border:none;padding:6px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;text-align:center;text-decoration:none">📞 Ligar</a>`:''}
-            <button onclick="event.stopPropagation();openTecModal('${t.id}')" style="flex:1;background:var(--bg);color:var(--muted);border:1px solid var(--border);padding:6px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--font)">✏️ Editar</button>
-            <button onclick="event.stopPropagation();delTec('${t.id}')" style="background:var(--bg);color:var(--danger);border:1px solid var(--border);padding:6px 10px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--font)">🗑️</button>
-          </div>
-        </div>
-      </div>`}).join('');
-  }
-
-  // Populate técnico filter dropdown
-  const sel=document.getElementById('fc-tec-filter');
-  sel.innerHTML='<option value="">Todos os técnicos</option>'+tecnicos.map(t=>`<option value="${t.nome}">${t.nome}</option>`).join('');
-  renderTecAgenda();
-}
-
-function renderTecAgenda(){
-  const filter=document.getElementById('fc-tec-filter').value;
-  const list=agendamentos.filter(a=>a.data>=tod()&&a.status!=='Cancelado'&&a.status!=='Concluído'&&a.tecnico&&(!filter||(a.tecnico||'').toLowerCase()===filter.toLowerCase())).sort((a,b)=>a.data.localeCompare(b.data)||(a.hora||'').localeCompare(b.hora||'')).slice(0,20);
-  const el=document.getElementById('tec-agenda-list');
-  if(!list.length){el.innerHTML='<div class="empty">Nenhum agendamento futuro com técnico vinculado.</div>';return}
-  el.innerHTML=list.map(a=>{
-    const c=clients.find(x=>x.id===a.clientId);
-    const tec=tecnicos.find(t=>t.nome.toLowerCase()===(a.tecnico||'').toLowerCase());
-    const color=tec?tecColor(tec.id):'var(--brand)';
-    return`<div class="t-row" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr 1fr">
-      <div style="display:flex;align-items:center;gap:8px">
-        <div style="width:26px;height:26px;border-radius:6px;background:${color};display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:white;flex-shrink:0">${a.tecnico?tecInitials(a.tecnico):'?'}</div>
-        <div class="cm" style="font-size:12px">${a.tecnico||'—'}</div>
-      </div>
-      <div class="td" style="font-size:12px">${c?c.empresa:'—'}</div>
-      <div class="td" style="font-size:11px">${a.tipo}</div>
-      <div class="td">${fD(a.data)} ${a.hora||''}</div>
-      <div><span class="badge badge-${(a.status||'').toLowerCase()}">${a.status}</span></div>
-    </div>`}).join('');
-}
-
-function openTecDetail(id){
-  const t=tecnicos.find(x=>x.id===id);if(!t)return;
-  const color=tecColor(t.id);
-  document.getElementById('td-avatar').textContent=tecInitials(t.nome);
-  document.getElementById('td-avatar').style.background=color;
-  document.getElementById('td-avatar').style.color='white';
-  document.getElementById('td-name').textContent=t.nome;
-  document.getElementById('td-cargo').textContent=t.cargo||'—';
-  document.getElementById('td-tel').textContent=t.telefone||'—';
-  document.getElementById('td-email').textContent=t.email||'—';
-  document.getElementById('td-status-badge').innerHTML=`<span class="badge badge-${(t.status||'ativo').toLowerCase()}">${t.status}</span>`;
-  document.getElementById('td-obs').textContent=t.obs||'—';
-  document.getElementById('td-especialidades').innerHTML=(t.especialidades||[]).map(e=>`<span style="background:var(--brand-pale);color:var(--brand);font-size:11px;padding:3px 10px;border-radius:10px;font-weight:500">${e}</span>`).join('')||'<span style="color:var(--muted);font-size:12px">Nenhuma especialidade cadastrada</span>';
-
-  const futA=agendamentos.filter(a=>(a.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&a.data>=tod()&&a.status!=='Cancelado').length;
-  const totSvc=services.filter(s=>(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()).length;
-  const concl=services.filter(s=>(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&s.status==='Concluído').length;
-  const ym=new Date().toISOString().slice(0,7);
-  const svcMes=services.filter(s=>(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()&&(s.data||'').startsWith(ym)).length;
-  document.getElementById('td-stats').innerHTML=`
-    <div class="kpi-card"><div class="kpi-icon">📅</div><div class="kpi-value">${futA}</div><div class="kpi-label">Agend. futuros</div></div>
-    <div class="kpi-card"><div class="kpi-icon">🔧</div><div class="kpi-value">${totSvc}</div><div class="kpi-label">Total serviços</div></div>
-    <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" style="color:var(--brand-light)">${concl}</div><div class="kpi-label">Concluídos</div></div>
-    <div class="kpi-card accent"><div class="kpi-icon">📆</div><div class="kpi-value">${svcMes}</div><div class="kpi-label">Serviços este mês</div></div>`;
-
-  const agList=agendamentos.filter(a=>(a.tecnico||'').toLowerCase()===t.nome.toLowerCase()).sort((a,b)=>a.data.localeCompare(b.data));
-  const agEl=document.getElementById('td-agend-list');
-  agEl.innerHTML=agList.length?agList.map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<div class="t-row" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr;padding:8px 18px"><div class="cm" style="font-size:12px">${c?c.empresa:'—'}</div><div class="td" style="font-size:11px">${a.tipo}</div><div class="td">${fD(a.data)} ${a.hora||''}</div><div><span class="badge badge-${(a.status||'').toLowerCase()}">${a.status}</span></div></div>`}).join(''):'<div class="empty">Nenhum agendamento.</div>';
-
-  const svcList=services.filter(s=>(s.tecnico||'').toLowerCase()===t.nome.toLowerCase()).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  const svcEl=document.getElementById('td-svc-list');
-  svcEl.innerHTML=svcList.length?svcList.map(s=>{const c=clients.find(x=>x.id===s.clientId);return`<div class="t-row" style="grid-template-columns:1.5fr 1.5fr 1fr 1fr;padding:8px 18px"><div class="cm" style="font-size:12px">${c?c.empresa:'—'}</div><div class="td" style="font-size:11px">${s.tipo.split('–')[0].trim()}</div><div class="td">${fD(s.data)}</div><div><span class="badge badge-${(s.status||'').toLowerCase().replace(/ /g,'\\ ')}">${s.status}</span></div></div>`}).join(''):'<div class="empty">Nenhum serviço.</div>';
-
-  // show page
-  const allPages=['dashboard','clientes','detail','agenda','tecnicos','tec-detail','servicos','alertas','relatorio'];
-  allPages.forEach(p=>document.getElementById('page-'+p).style.display='none');
-  document.getElementById('page-tec-detail').style.display='';
-  document.getElementById('nav-tecnicos').classList.add('active');
-  document.getElementById('topbar-title').textContent='Técnico';
-  document.getElementById('topbar-subtitle').textContent=t.nome;
-}
-
-let editTecId=null;
-function openTecModal(id){
-  editTecId=id||null;const t=id?tecnicos.find(x=>x.id===id):null;
-  document.getElementById('mt-title').textContent=t?'Editar Técnico':'Novo Técnico';
-  document.getElementById('mt-nome').value=t?.nome||'';
-  document.getElementById('mt-cargo').value=t?.cargo||'Técnico de Segurança do Trabalho';
-  document.getElementById('mt-registro').value=t?.registro||'';
-  document.getElementById('mt-tel').value=t?.telefone||'';
-  document.getElementById('mt-email').value=t?.email||'';
-  document.getElementById('mt-status').value=t?.status||'Ativo';
-  document.getElementById('mt-obs').value=t?.obs||'';
-  document.querySelectorAll('#esp-chips .nr-chip').forEach(ch=>ch.classList.toggle('selected',t?(t.especialidades||[]).includes(ch.dataset.esp):false));
-  document.getElementById('modal-tec').style.display='flex';
-}
-function saveTec(){
-  const nome=document.getElementById('mt-nome').value.trim();if(!nome){alert('Informe o nome.');return}
-  const especialidades=[...document.querySelectorAll('#esp-chips .nr-chip.selected')].map(c=>c.dataset.esp);
-  const d={id:editTecId||Date.now().toString(),nome,cargo:document.getElementById('mt-cargo').value,registro:document.getElementById('mt-registro').value.trim(),telefone:document.getElementById('mt-tel').value.trim(),email:document.getElementById('mt-email').value.trim(),status:document.getElementById('mt-status').value,especialidades,obs:document.getElementById('mt-obs').value.trim()};
-  if(editTecId){const i=tecnicos.findIndex(t=>t.id===editTecId);tecnicos[i]=d}else tecnicos.push(d);
-  persist();closeModals();renderTecnicos();
-}
-function delTec(id){if(!confirm('Remover este técnico?'))return;tecnicos=tecnicos.filter(t=>t.id!==id);persist();renderTecnicos()}
-
-
-// ===== DOCUMENTOS =====
-const DOC_ICONS={'PPRA':'📋','PCMSO':'🏥','PGR':'⚠️','LTCAT':'🔬','Laudo':'📄','ASO':'👨‍⚕️','APR':'📝','Mapa':'🗺️','CIPA':'🛡️','Certificado':'🎓','Contrato':'📜','Relatório':'📊','Outro':'📁'};
-function docIcon(tipo){const k=Object.keys(DOC_ICONS).find(k=>tipo.includes(k));return DOC_ICONS[k]||'📁'}
-function docStatusInfo(d){
-  if(!d.validade)return{label:'Sem validade',color:'#6B7280',bg:'#F3F4F6'};
-  const days=dU(d.validade);
-  if(days<0)return{label:`Vencido há ${Math.abs(days)}d`,color:'#991B1B',bg:'#FEE2E2'};
-  if(days<=30)return{label:`Vence em ${days}d`,color:'#92400E',bg:'#FEF3C7'};
-  return{label:`Válido até ${fD(d.validade)}`,color:'#065F46',bg:'#D1FAE5'};
-}
-
-function renderDocs(){
-  const q=(document.getElementById('sc-doc').value||'').toLowerCase();
-  const ft=document.getElementById('fc-doc-tipo').value;
-  const fs=document.getElementById('fc-doc-status').value;
-  const filtered=documentos.filter(d=>{
-    const c=clients.find(x=>x.id===d.clientId);
-    const m=!q||d.tipo.toLowerCase().includes(q)||(c?c.empresa.toLowerCase().includes(q):false)||(d.num||'').toLowerCase().includes(q)||(d.tecnico||'').toLowerCase().includes(q);
-    const tipoOk=!ft||d.tipo.includes(ft);
-    const si=docStatusInfo(d);
-    const statusOk=!fs||(fs==='Válido'&&si.label.startsWith('Válido'))||(fs==='Vencido'&&si.label.startsWith('Vencido'))||(fs==='Sem validade'&&si.label==='Sem validade');
-    return m&&tipoOk&&statusOk;
-  }).sort((a,b)=>(b.emissao||'').localeCompare(a.emissao||''));
-
-  const vencidos=documentos.filter(d=>d.validade&&dU(d.validade)<0).length;
-  const breve=documentos.filter(d=>d.validade&&dU(d.validade)>=0&&dU(d.validade)<=30).length;
-  const validos=documentos.filter(d=>d.validade&&dU(d.validade)>30).length;
-  const semVal=documentos.filter(d=>!d.validade).length;
-  document.getElementById('doc-kpis').innerHTML=`
-    <div class="kpi-card"><div class="kpi-icon">📁</div><div class="kpi-value">${documentos.length}</div><div class="kpi-label">Total de Documentos</div></div>
-    <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" style="color:var(--brand-light)">${validos}</div><div class="kpi-label">Válidos</div></div>
-    <div class="kpi-card warn"><div class="kpi-icon">⏰</div><div class="kpi-value">${breve}</div><div class="kpi-label">Vencem em 30 dias</div></div>
-    <div class="kpi-card danger"><div class="kpi-icon">🔴</div><div class="kpi-value">${vencidos}</div><div class="kpi-label">Vencidos</div></div>
-    <div class="kpi-card"><div class="kpi-icon">♾️</div><div class="kpi-value">${semVal}</div><div class="kpi-label">Sem validade</div></div>`;
-
-  const grid=document.getElementById('doc-grid');
-  if(!filtered.length){grid.innerHTML='<div class="empty" style="grid-column:1/-1;padding:3rem">📁 Nenhum documento encontrado. Clique em + Documento para adicionar.</div>';return}
-  grid.innerHTML=filtered.map(d=>{
-    const c=clients.find(x=>x.id===d.clientId);
-    const si=docStatusInfo(d);
-    const icon=docIcon(d.tipo);
-    const tipoShort=d.tipo.split('–')[0].trim().split(' ').slice(0,2).join(' ');
-    return`<div class="card" style="overflow:visible">
-      <div style="padding:16px 18px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:12px">
-        <div style="width:42px;height:42px;border-radius:10px;background:var(--brand-pale);display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0">${icon}</div>
-        <div style="flex:1;min-width:0">
-          <div style="font-size:12px;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${d.tipo.split('–')[0].trim()}</div>
-          <div style="font-size:11px;color:var(--muted);margin-top:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c?c.empresa:'—'}</div>
-          ${d.num?`<div style="font-size:10px;color:var(--muted);font-family:var(--mono);margin-top:1px">${d.num}</div>`:''}
-        </div>
-        <span style="background:${si.bg};color:${si.color};font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;white-space:nowrap;flex-shrink:0">${si.label}</span>
-      </div>
-      <div style="padding:12px 18px">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px">
-          <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Emissão</div><div style="font-size:12px;font-weight:500;margin-top:2px">${fD(d.emissao)}</div></div>
-          <div><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Validade</div><div style="font-size:12px;font-weight:500;margin-top:2px;color:${si.color}">${fD(d.validade)}</div></div>
-          ${d.tecnico?`<div style="grid-column:1/-1"><div style="font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:.4px">Técnico</div><div style="font-size:12px;font-weight:500;margin-top:2px">${d.tecnico}</div></div>`:''}
-        </div>
-        ${d.obs?`<div style="font-size:11px;color:var(--muted);background:var(--bg);border-radius:6px;padding:7px 10px;margin-bottom:10px;line-height:1.5">${d.obs}</div>`:''}
-        <div style="display:flex;gap:6px">
-          ${d.fileData?`<button onclick="viewDoc('${d.id}')" style="flex:1;background:var(--brand-pale);color:var(--brand);border:none;padding:7px;border-radius:7px;font-size:11px;font-weight:500;cursor:pointer;font-family:var(--font)">👁️ Visualizar</button>`:'<div style="flex:1;background:var(--bg);border-radius:7px;padding:7px;font-size:11px;color:var(--muted);text-align:center">Sem arquivo</div>'}
-          ${d.fileData?`<button onclick="downloadDoc('${d.id}')" style="background:var(--bg);color:var(--muted);border:1px solid var(--border);padding:7px 10px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--font)">⬇️</button>`:''}
-          <button onclick="openDocModal('${d.id}')" style="background:var(--bg);color:var(--muted);border:1px solid var(--border);padding:7px 10px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--font)">✏️</button>
-          <button onclick="delDoc('${d.id}')" style="background:var(--bg);color:var(--danger);border:1px solid var(--border);padding:7px 10px;border-radius:7px;font-size:11px;cursor:pointer;font-family:var(--font)">🗑️</button>
-        </div>
-      </div>
-    </div>`}).join('');
-}
-
-// File handling
-let pendingFileData=null, pendingFileName=null, pendingFileMime=null;
-function handleFileSelect(input){
-  const file=input.files[0];if(!file)return;
-  processFile(file);
-}
-function handleDrop(e){
-  e.preventDefault();
-  document.getElementById('mdoc-dropzone').style.borderColor='var(--border)';
-  document.getElementById('mdoc-dropzone').style.background='var(--bg)';
-  const file=e.dataTransfer.files[0];if(!file)return;
-  processFile(file);
-}
-function processFile(file){
-  if(file.size>5*1024*1024){alert('Arquivo muito grande. Máximo 5MB.');return}
-  const reader=new FileReader();
-  reader.onload=e=>{
-    pendingFileData=e.target.result;
-    pendingFileName=file.name;
-    pendingFileMime=file.type;
-    document.getElementById('mdoc-file-label').innerHTML=`<span style="color:var(--brand);font-weight:600">✅ ${file.name}</span><br><span style="font-size:10px">${(file.size/1024).toFixed(1)} KB</span>`;
-    document.getElementById('mdoc-dropzone').style.borderColor='var(--brand)';
-    document.getElementById('mdoc-dropzone').style.background='var(--brand-pale)';
-  };
-  reader.readAsDataURL(file);
-}
-
-let editDocId=null;
-function openDocModal(id, preClientId){
-  editDocId=id||null;
-  // Populate client select
-  const csel=document.getElementById('mdoc-client');
-  csel.innerHTML=clients.length?clients.map(c=>`<option value="${c.id}">${c.empresa}</option>`).join(''):'<option value="">— Nenhum cliente —</option>';
-  // Populate técnico select
-  const tsel=document.getElementById('mdoc-tec');
-  tsel.innerHTML='<option value="">— Selecionar técnico —</option>'+tecnicos.map(t=>`<option value="${t.nome}">${t.nome}</option>`).join('');
-  
-  const d=id?documentos.find(x=>x.id===id):null;
-  if(!id&&preClientId)setTimeout(()=>{document.getElementById('mdoc-client').value=preClientId},10);
-  document.getElementById('mdoc-title').textContent=d?'Editar Documento':'Novo Documento';
-  if(d&&d.clientId)csel.value=d.clientId;
-  document.getElementById('mdoc-tipo').value=d?.tipo||document.getElementById('mdoc-tipo').options[0].value;
-  document.getElementById('mdoc-num').value=d?.num||'';
-  document.getElementById('mdoc-tec').value=d?.tecnico||'';
-  document.getElementById('mdoc-emissao').value=d?.emissao||tod();
-  document.getElementById('mdoc-validade').value=d?.validade||'';
-  document.getElementById('mdoc-obs').value=d?.obs||'';
-  pendingFileData=null;pendingFileName=null;pendingFileMime=null;
-  const lbl=document.getElementById('mdoc-file-label');
-  if(d?.fileName){lbl.innerHTML=`<span style="color:var(--brand);font-weight:600">📎 ${d.fileName}</span><br><span style="font-size:10px;color:var(--muted)">Arquivo atual — envie outro para substituir</span>`;document.getElementById('mdoc-dropzone').style.borderColor='var(--brand)';document.getElementById('mdoc-dropzone').style.background='var(--brand-pale)'}
-  else{lbl.textContent='Arraste um arquivo ou clique para selecionar';document.getElementById('mdoc-dropzone').style.borderColor='var(--border)';document.getElementById('mdoc-dropzone').style.background='var(--bg)'}
-  document.getElementById('modal-doc').style.display='flex';
-}
-function onDocTipoChange(){}
-function saveDoc(){
-  const cid=document.getElementById('mdoc-client').value;
-  if(!cid){alert('Selecione um cliente.');return}
-  const tipo=document.getElementById('mdoc-tipo').value;
-  const existing=editDocId?documentos.find(x=>x.id===editDocId):null;
-  const d={
-    id:editDocId||Date.now().toString(),
-    clientId:cid,
-    tipo,
-    num:document.getElementById('mdoc-num').value.trim(),
-    tecnico:document.getElementById('mdoc-tec').value,
-    emissao:document.getElementById('mdoc-emissao').value,
-    validade:document.getElementById('mdoc-validade').value,
-    obs:document.getElementById('mdoc-obs').value.trim(),
-    fileData:pendingFileData||(existing?.fileData||null),
-    fileName:pendingFileName||(existing?.fileName||null),
-    fileMime:pendingFileMime||(existing?.fileMime||null),
-  };
-  if(editDocId){const i=documentos.findIndex(x=>x.id===editDocId);documentos[i]=d}else documentos.push(d);
-  persist();closeModals();renderDocs();
-}
-
-function renderClientDocs(cid){
-  const list=documentos.filter(d=>d.clientId===cid).sort((a,b)=>(b.emissao||'').localeCompare(a.emissao||''));
-  const el=document.getElementById('client-doc-list');
-  if(!el)return;
-  if(!list.length){el.innerHTML='<div class="empty">Nenhum documento vinculado.</div>';return}
-  el.innerHTML=list.map(d=>{
-    const si=docStatusInfo(d);
-    const icon=docIcon(d.tipo);
-    return`<div class="t-row" style="grid-template-columns:2fr 1fr 1fr 1fr 80px;padding:10px 18px;align-items:center">
-      <div style="display:flex;align-items:center;gap:10px">
-        <span style="font-size:16px">${icon}</span>
-        <div><div class="cm" style="font-size:12px">${d.tipo.split('–')[0].trim()}</div>${d.num?`<div class="cs">${d.num}</div>`:''}</div>
-      </div>
-      <div class="td">${fD(d.emissao)}</div>
-      <div class="td"><span style="background:${si.bg};color:${si.color};font-size:10px;font-weight:600;padding:2px 8px;border-radius:10px">${si.label}</span></div>
-      <div class="td">${d.tecnico||'—'}</div>
-      <div class="ra">
-        ${d.fileData?`<button class="bi" onclick="viewDoc('${d.id}')" title="Visualizar">👁️</button>`:''}
-        ${d.fileData?`<button class="bi" onclick="downloadDoc('${d.id}')" title="Baixar">⬇️</button>`:''}
-        <button class="bi" onclick="openDocModal('${d.id}')">✏️</button>
-        <button class="bi del" onclick="delDoc('${d.id}');renderClientDocs('${cid}')">🗑️</button>
-      </div>
-    </div>`}).join('');
-}
-
-function delDoc(id){if(!confirm('Remover documento?'))return;documentos=documentos.filter(d=>d.id!==id);persist();renderDocs()}
-function viewDoc(id){
-  const d=documentos.find(x=>x.id===id);if(!d||!d.fileData)return;
-  const c=clients.find(x=>x.id===d.clientId);
-  document.getElementById('viewer-title').textContent=d.tipo.split('–')[0].trim();
-  document.getElementById('viewer-sub').textContent=(c?c.empresa:'—')+(d.num?' · '+d.num:'');
-  const btn=document.getElementById('viewer-download');
-  btn.onclick=()=>downloadDoc(id);
-  const body=document.getElementById('viewer-body');
-  if(d.fileMime&&d.fileMime.startsWith('image/')){
-    body.innerHTML=`<img src="${d.fileData}" style="max-width:100%;border-radius:8px;display:block;margin:0 auto">`;
-  } else if(d.fileMime==='application/pdf'){
-    body.innerHTML=`<iframe src="${d.fileData}" style="width:100%;height:55vh;border:none;border-radius:8px"></iframe>`;
-  } else {
-    body.innerHTML=`<div style="text-align:center;padding:2rem"><div style="font-size:48px;margin-bottom:12px">📄</div><div style="font-weight:600;margin-bottom:8px">${d.fileName||'Arquivo'}</div><div style="color:var(--muted);font-size:12px;margin-bottom:16px">Este tipo de arquivo não pode ser pré-visualizado</div><button class="btn-p" onclick="downloadDoc('${id}')">⬇️ Baixar arquivo</button></div>`;
-  }
-  document.getElementById('modal-viewer').style.display='flex';
-}
-function downloadDoc(id){
-  const d=documentos.find(x=>x.id===id);if(!d||!d.fileData)return;
-  const a=document.createElement('a');a.href=d.fileData;a.download=d.fileName||'documento';a.click();
-}
-
-
-// ===== NEW CHART FUNCTIONS =====
-
-function renderTimeline(){
-  const now=new Date();
-  const months=[];
-  for(let i=11;i>=0;i--){
-    const d=new Date(now.getFullYear(),now.getMonth()-i,1);
-    months.push({label:MESES_CURTOS[d.getMonth()],ym:`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`});
-  }
-  const counts=months.map(m=>services.filter(s=>s.data&&s.data.startsWith(m.ym)).length);
-  const agCounts=months.map(m=>agendamentos.filter(a=>a.data&&a.data.startsWith(m.ym)).length);
-  const svg=document.getElementById('svg-timeline');if(!svg)return;
-  const W=svg.getBoundingClientRect().width||600;
-  const H=110;const PAD={l:30,r:10,t:16,b:28};
-  const maxV=Math.max(...counts,...agCounts,1);
-  const pts=(arr)=>arr.map((v,i)=>{
-    const x=PAD.l+(i/(months.length-1||1))*(W-PAD.l-PAD.r);
-    const y=PAD.t+(1-v/maxV)*(H-PAD.t-PAD.b);
-    return{x,y,v};
-  });
-  const svgLine=(pts,color,fill)=>{
-    const d='M'+pts.map(p=>`${p.x.toFixed(1)},${p.y.toFixed(1)}`).join('L');
-    const fa=`${d}L${pts[pts.length-1].x.toFixed(1)},${(H-PAD.b).toFixed(1)}L${pts[0].x.toFixed(1)},${(H-PAD.b).toFixed(1)}Z`;
-    return`<path d="${fa}" fill="${fill}" opacity="0.15"/><path d="${d}" fill="none" stroke="${color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
-  };
-  const circles=(pts,color)=>pts.map(p=>`<circle cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="3.5" fill="${color}" stroke="white" stroke-width="1.5"><title>${p.v}</title></circle>`).join('');
-  const labels=months.map((m,i)=>{
-    const x=PAD.l+(i/(months.length-1||1))*(W-PAD.l-PAD.r);
-    return`<text x="${x.toFixed(1)}" y="${H}" text-anchor="middle" font-size="9" fill="#5A7268" font-family="Sora">${m.label}</text>`;
-  }).join('');
-  const gridY=[0,0.25,0.5,0.75,1].map(f=>{
-    const y=(PAD.t+f*(H-PAD.t-PAD.b)).toFixed(1);
-    const v=Math.round(maxV*(1-f));
-    return`<line x1="${PAD.l}" y1="${y}" x2="${(W-PAD.r)}" y2="${y}" stroke="#E6EFEC" stroke-width="1"/><text x="${(PAD.l-4).toFixed(1)}" y="${(+y+3).toFixed(1)}" text-anchor="end" font-size="8" fill="#5A7268" font-family="Sora">${v}</text>`;
-  }).join('');
-  const p1=pts(counts), p2=pts(agCounts);
-  if(!svg)return;svg.innerHTML=`${gridY}${svgLine(p1,'#1B4D3E','#1B4D3E')}${svgLine(p2,'#2563EB','#2563EB')}${circles(p1,'#1B4D3E')}${circles(p2,'#2563EB')}${labels}
-    <g><rect x="${PAD.l}" y="2" width="10" height="4" rx="2" fill="#1B4D3E"/><text x="${PAD.l+14}" y="7" font-size="9" fill="#5A7268" font-family="Sora">Serviços</text><rect x="${PAD.l+60}" y="2" width="10" height="4" rx="2" fill="#2563EB"/><text x="${PAD.l+74}" y="7" font-size="9" fill="#5A7268" font-family="Sora">Agendamentos</text></g>`;
-}
-
-function buildDonut(svgId, legendId, data, cx, cy, r, stroke){
-  const total=data.reduce((s,d)=>s+d.val,0)||1;
-  const circ=2*Math.PI*r;
-  let offset=0, paths='';
-  data.forEach(d=>{
-    const pct=d.val/total;
-    const dash=pct*circ;
-    const rotate=offset*360-90;
-    if(d.val>0)paths+=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${d.color}" stroke-width="${stroke}" stroke-dasharray="${dash.toFixed(2)} ${circ.toFixed(2)}" transform="rotate(${rotate.toFixed(2)} ${cx} ${cy})" stroke-linecap="butt"><title>${d.label}: ${d.val}</title></circle>`;
-    offset+=pct;
-  });
-  const svgEl=document.getElementById(svgId);
-  if(svgEl)svgEl.innerHTML=`<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#E6EFEC" stroke-width="${stroke}"/>${paths}<text x="${cx}" y="${cy+1}" text-anchor="middle" dominant-baseline="middle" font-size="${Math.round(r*0.45)}" font-weight="700" fill="#0F1C19" font-family="Sora">${data.reduce((s,d)=>s+d.val,0)}</text>`;
-  const legEl=document.getElementById(legendId);
-  if(legEl)legEl.innerHTML=data.map(d=>`<div style="display:flex;align-items:center;gap:7px;margin-bottom:7px"><div style="width:8px;height:8px;border-radius:50%;background:${d.color};flex-shrink:0"></div><span style="font-size:11px;color:var(--muted);flex:1">${d.label}</span><span style="font-size:12px;font-weight:700">${d.val}</span></div>`).join('');
-}
-
-function renderDonutStatus(){
-  const conc=services.filter(s=>s.status==='Concluído').length;
-  const and=services.filter(s=>s.status==='Em andamento').length;
-  const ag=services.filter(s=>s.status==='Agendado').length;
-  const can=services.filter(s=>s.status==='Cancelado').length;
-  buildDonut('donut-status-svg','donut-status-legend',[
-    {label:'Concluído',val:conc,color:'#1B4D3E'},
-    {label:'Em andamento',val:and,color:'#F5A623'},
-    {label:'Agendado',val:ag,color:'#2563EB'},
-    {label:'Cancelado',val:can,color:'#C0392B'},
-  ],50,50,38,13);
-}
-
-function renderDonutSegmento(){
-  const seg={};
-  clients.forEach(c=>{const k=c.segmento||'Outro';seg[k]=(seg[k]||0)+1});
-  const palette=['#1B4D3E','#2E7D5E','#3A9B72','#F5A623','#E67E22','#2563EB','#7C3AED','#C0392B','#0891B2'];
-  const data=Object.entries(seg).sort((a,b)=>b[1]-a[1]).map(([k,v],i)=>({label:k,val:v,color:palette[i%palette.length]}));
-  buildDonut('donut-segmento-svg','donut-segmento-legend',data,60,60,46,14);
-}
-
-function renderNRsChart(){
-  const nrCount={};
-  services.forEach(s=>(s.nrs||[]).forEach(nr=>{nrCount[nr]=(nrCount[nr]||0)+1}));
-  const sorted=Object.entries(nrCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
-  const max=sorted.length?sorted[0][1]:1;
-  const palette=['#1B4D3E','#2E7D5E','#2563EB','#7C3AED','#F5A623','#E67E22','#0891B2','#C0392B'];
-  const el=document.getElementById('dash-nrs-chart');
-  if(!el)return;
-  el.innerHTML=sorted.length?sorted.map(([nr,qt],i)=>`
-    <div class="bar-row">
-      <div class="bar-label" style="width:60px">${nr}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${(qt/max*100)}%;background:${palette[i%palette.length]}"></div></div>
-      <div class="bar-count">${qt}</div>
-    </div>`).join(''):'<div class="empty">Nenhuma NR registrada ainda.</div>';
-}
-
-// ===== PDF EXPORT SYSTEM =====
-function buildPDFDoc(title, sections){
-  const css=`
-    body{font-family:Arial,sans-serif;font-size:11px;color:#0F1C19;margin:0;padding:0}
-    .page{padding:32px 36px;max-width:210mm;margin:0 auto}
-    h1{color:#1B4D3E;font-size:20px;margin:0 0 4px}
-    h2{color:#1B4D3E;font-size:14px;margin:24px 0 10px;border-bottom:2px solid #1B4D3E;padding-bottom:4px}
-    h3{color:#2E7D5E;font-size:12px;margin:16px 0 6px}
-    .subtitle{color:#5A7268;font-size:11px;margin-bottom:20px}
-    .kpi-row{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
-    .kpi-box{background:#F0F5F3;border-radius:8px;padding:12px 16px;min-width:100px;flex:1}
-    .kpi-val{font-size:22px;font-weight:700;color:#1B4D3E}
-    .kpi-lbl{font-size:10px;color:#5A7268;margin-top:2px}
-    table{width:100%;border-collapse:collapse;margin-bottom:16px}
-    th{background:#1B4D3E;color:white;padding:7px 10px;text-align:left;font-size:10px;letter-spacing:.3px}
-    td{padding:6px 10px;border-bottom:1px solid #E6EFEC;font-size:10px;vertical-align:top}
-    tr:nth-child(even) td{background:#F8FAFA}
-    .badge{display:inline-block;padding:2px 7px;border-radius:10px;font-size:9px;font-weight:600}
-    .b-ok{background:#D1FAE5;color:#065F46}
-    .b-warn{background:#FEF3C7;color:#92400E}
-    .b-err{background:#FEE2E2;color:#991B1B}
-    .b-info{background:#DBEAFE;color:#1E40AF}
-    .footer{margin-top:32px;padding-top:12px;border-top:1px solid #E6EFEC;font-size:9px;color:#5A7268;display:flex;justify-content:space-between}
-    @media print{body{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
-  `;
-  const now=new Date();
-  const dateStr=`${now.getDate().toString().padStart(2,'0')}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getFullYear()}`;
-  const footer=`<div class="footer"><span>Segurança &amp; Trabalho — Sistema de Gestão</span><span>Gerado em ${dateStr}</span></div>`;
-  return`<!DOCTYPE html><!-- v7.0 --><html><head><meta charset="UTF-8"><title>${title}</title><style>${css}</style></head><body><div class="page"><h1>${title}</h1><div class="subtitle">Emitido em ${dateStr}</div>${sections.join('')}${footer}</div>
-  <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-</div>
-</body></html>`;
-}
-
-function printPDF(html, fname){
-  const w=window.open('','_blank','width=960,height=780');
-  w.document.write(html);w.document.close();
-  setTimeout(()=>{w.focus();w.print()},600);
-}
-
-function badgeClass(status){
-  const s=(status||'').toLowerCase();
-  if(s==='concluído'||s==='ativo'||s==='confirmado'||s==='válido')return'b-ok';
-  if(s==='vencido'||s==='inativo'||s==='cancelado')return'b-err';
-  if(s==='agendado'||s==='em andamento')return'b-info';
-  return'b-warn';
-}
-
-function exportDashboardPDF(){
-  const venc=services.filter(s=>s.validade&&dU(s.validade)<0).length;
-  const breve=services.filter(s=>s.validade&&dU(s.validade)>=0&&dU(s.validade)<=30).length;
-  const futA=agendamentos.filter(a=>a.data>=tod()&&a.status!=='Cancelado').length;
-
-  const kpis=`<div class="kpi-row">
-    <div class="kpi-box"><div class="kpi-val">${clients.length}</div><div class="kpi-lbl">Total Clientes</div></div>
-    <div class="kpi-box"><div class="kpi-val">${clients.filter(c=>c.status==='Ativo').length}</div><div class="kpi-lbl">Clientes Ativos</div></div>
-    <div class="kpi-box"><div class="kpi-val">${services.length}</div><div class="kpi-lbl">Serviços</div></div>
-    <div class="kpi-box"><div class="kpi-val">${futA}</div><div class="kpi-lbl">Agend. Futuros</div></div>
-    <div class="kpi-box"><div class="kpi-val" style="color:#C0392B">${venc}</div><div class="kpi-lbl">Docs Vencidos</div></div>
-    <div class="kpi-box"><div class="kpi-val" style="color:#E67E22">${breve}</div><div class="kpi-lbl">Vencem 30d</div></div>
-  </div>`;
-
-  // Próximos agendamentos
-  const nextAgend=agendamentos.filter(a=>a.data>=tod()&&a.status!=='Cancelado').sort((a,b)=>a.data.localeCompare(b.data)).slice(0,10);
-  const agTable=`<h2>📅 Próximos Agendamentos</h2><table><tr><th>Cliente</th><th>Serviço</th><th>Data</th><th>Horário</th><th>Técnico</th><th>Status</th></tr>${nextAgend.map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${a.tipo}</td><td>${fD(a.data)}</td><td>${a.hora||'—'}</td><td>${a.tecnico||'—'}</td><td><span class="badge ${badgeClass(a.status)}">${a.status}</span></td></tr>`}).join('')}</table>`;
-
-  // Vencimentos críticos
-  const critDocs=services.filter(s=>s.validade&&dU(s.validade)<=30).sort((a,b)=>a.validade.localeCompare(b.validade)).slice(0,10);
-  const critTable=`<h2>⚠️ Documentos com Vencimento Crítico</h2><table><tr><th>Cliente</th><th>Documento</th><th>Validade</th><th>Situação</th></tr>${critDocs.map(s=>{const c=clients.find(x=>x.id===s.clientId);const d=dU(s.validade);const sit=d<0?`Vencido há ${Math.abs(d)} dias`:`Vence em ${d} dias`;return`<tr><td>${c?c.empresa:'—'}</td><td>${s.tipo.split('–')[0].trim()}</td><td>${fD(s.validade)}</td><td><span class="badge ${d<0?'b-err':'b-warn'}">${sit}</span></td></tr>`}).join('')}</table>`;
-
-  // Serviços por tipo
-  const byType={};services.forEach(s=>{const k=s.tipo.split('–')[0].trim().split(' ').slice(0,3).join(' ');byType[k]=(byType[k]||0)+1});
-  const typeTable=`<h2>🔧 Serviços por Tipo</h2><table><tr><th>Tipo de Serviço</th><th>Quantidade</th></tr>${Object.entries(byType).sort((a,b)=>b[1]-a[1]).map(([t,q])=>`<tr><td>${t}</td><td>${q}</td></tr>`).join('')}</table>`;
-
-  const html=buildPDFDoc('Dashboard — Visão Geral',[kpis,agTable,critTable,typeTable]);
-  printPDF(html,'dashboard');
-}
-
-function exportClientePDF(cid){
-  const c=clients.find(x=>x.id===cid);if(!c)return;
-  const svcs=services.filter(s=>s.clientId===cid).sort((a,b)=>(b.data||'').localeCompare(a.data||''));
-  const ags=agendamentos.filter(a=>a.clientId===cid).sort((a,b)=>a.data.localeCompare(b.data));
-  const docs=documentos.filter(d=>d.clientId===cid);
-
-  const info=`<div class="kpi-row">
-    <div class="kpi-box"><div class="kpi-val">${c.empresa}</div><div class="kpi-lbl">Razão Social</div></div>
-    <div class="kpi-box"><div class="kpi-val">${c.cnpj||'—'}</div><div class="kpi-lbl">CNPJ</div></div>
-    <div class="kpi-box"><div class="kpi-val">${c.responsavel||'—'}</div><div class="kpi-lbl">Responsável</div></div>
-    <div class="kpi-box"><div class="kpi-val">${c.telefone||'—'}</div><div class="kpi-lbl">Telefone</div></div>
-    <div class="kpi-box"><div class="kpi-val">${c.segmento||'—'}</div><div class="kpi-lbl">Segmento</div></div>
-    <div class="kpi-box"><div class="kpi-val">${c.funcionarios||'—'}</div><div class="kpi-lbl">Funcionários</div></div>
-  </div>`;
-
-  const agTable=ags.length?`<h2>📅 Agendamentos</h2><table><tr><th>Tipo</th><th>Data</th><th>Hora</th><th>Técnico</th><th>Local</th><th>Status</th></tr>${ags.map(a=>`<tr><td>${a.tipo}</td><td>${fD(a.data)}</td><td>${a.hora||'—'}</td><td>${a.tecnico||'—'}</td><td>${a.local||'—'}</td><td><span class="badge ${badgeClass(a.status)}">${a.status}</span></td></tr>`).join('')}</table>`:'';
-
-  const svcTable=svcs.length?`<h2>🔧 Histórico de Serviços</h2><table><tr><th>Serviço</th><th>Normas</th><th>Data</th><th>Validade</th><th>Técnico</th><th>Status</th></tr>${svcs.map(s=>{const vb=vB(s.validade);return`<tr><td>${s.tipo.split('–')[0].trim()}</td><td>${(s.nrs||[]).join(', ')||'—'}</td><td>${fD(s.data)}</td><td style="color:${vb?'#C0392B':'inherit'}">${fD(s.validade)}</td><td>${s.tecnico||'—'}</td><td><span class="badge ${badgeClass(s.status)}">${s.status}</span></td></tr>`}).join('')}</table>`:'';
-
-  const docTable=docs.length?`<h2>📁 Documentos</h2><table><tr><th>Documento</th><th>Nº/Rev</th><th>Emissão</th><th>Validade</th><th>Técnico</th></tr>${docs.map(d=>{const si=docStatusInfo(d);return`<tr><td>${d.tipo.split('–')[0].trim()}</td><td>${d.num||'—'}</td><td>${fD(d.emissao)}</td><td><span class="badge ${si.label.startsWith('Válido')?'b-ok':si.label.startsWith('Vencido')?'b-err':'b-warn'}">${si.label}</span></td><td>${d.tecnico||'—'}</td></tr>`}).join('')}</table>`:'';
-
-  const html=buildPDFDoc(`Relatório — ${c.empresa}`,[info,agTable,svcTable,docTable]);
-  printPDF(html,c.empresa);
-}
-
-function exportRelatorioGeralPDF(){
-  const ym=new Date().toISOString().slice(0,7);
-  const ms=services.filter(s=>s.data&&s.data.startsWith(ym));
-  const ma=agendamentos.filter(a=>a.data&&a.data.startsWith(ym));
-  const mes=MESES[new Date().getMonth()]+' '+new Date().getFullYear();
-
-  const kpis=`<div class="kpi-row">
-    <div class="kpi-box"><div class="kpi-val">${clients.length}</div><div class="kpi-lbl">Clientes</div></div>
-    <div class="kpi-box"><div class="kpi-val">${clients.filter(c=>c.status==='Ativo').length}</div><div class="kpi-lbl">Ativos</div></div>
-    <div class="kpi-box"><div class="kpi-val">${ms.length}</div><div class="kpi-lbl">Serviços este mês</div></div>
-    <div class="kpi-box"><div class="kpi-val">${ma.length}</div><div class="kpi-lbl">Agend. este mês</div></div>
-    <div class="kpi-box"><div class="kpi-val">${services.filter(s=>s.status==='Concluído').length}</div><div class="kpi-lbl">Concluídos total</div></div>
-    <div class="kpi-box"><div class="kpi-val">${documentos.length}</div><div class="kpi-lbl">Documentos</div></div>
-  </div>`;
-
-  // Clientes
-  const clientTable=`<h2>👥 Base de Clientes</h2><table><tr><th>Empresa</th><th>CNPJ</th><th>Segmento</th><th>Responsável</th><th>Status</th></tr>${clients.map(c=>`<tr><td>${c.empresa}</td><td>${c.cnpj||'—'}</td><td>${c.segmento||'—'}</td><td>${c.responsavel||'—'}</td><td><span class="badge ${badgeClass(c.status)}">${c.status}</span></td></tr>`).join('')}</table>`;
-
-  // Serviços do mês
-  const svcMesTable=ms.length?`<h2>🔧 Serviços — ${mes}</h2><table><tr><th>Empresa</th><th>Serviço</th><th>Data</th><th>Técnico</th><th>Status</th></tr>${ms.sort((a,b)=>a.data.localeCompare(b.data)).map(s=>{const c=clients.find(x=>x.id===s.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${s.tipo.split('–')[0].trim()}</td><td>${fD(s.data)}</td><td>${s.tecnico||'—'}</td><td><span class="badge ${badgeClass(s.status)}">${s.status}</span></td></tr>`}).join('')}</table>`:'';
-
-  // Agendamentos do mês
-  const agMesTable=ma.length?`<h2>📅 Agendamentos — ${mes}</h2><table><tr><th>Empresa</th><th>Serviço</th><th>Data</th><th>Hora</th><th>Técnico</th><th>Status</th></tr>${ma.sort((a,b)=>a.data.localeCompare(b.data)).map(a=>{const c=clients.find(x=>x.id===a.clientId);return`<tr><td>${c?c.empresa:'—'}</td><td>${a.tipo}</td><td>${fD(a.data)}</td><td>${a.hora||'—'}</td><td>${a.tecnico||'—'}</td><td><span class="badge ${badgeClass(a.status)}">${a.status}</span></td></tr>`}).join('')}</table>`:'';
-
-  // Técnicos
-  const tecTable=tecnicos.length?`<h2>👷 Equipe Técnica</h2><table><tr><th>Nome</th><th>Cargo</th><th>Registro</th><th>Especialidades</th><th>Status</th></tr>${tecnicos.map(t=>`<tr><td>${t.nome}</td><td>${t.cargo||'—'}</td><td>${t.registro||'—'}</td><td>${(t.especialidades||[]).slice(0,3).join(', ')}</td><td><span class="badge ${badgeClass(t.status)}">${t.status}</span></td></tr>`).join('')}</table>`:'';
-
-  // Docs vencidos
-  const docsVenc=services.filter(s=>s.validade&&dU(s.validade)<=30).sort((a,b)=>a.validade.localeCompare(b.validade));
-  const vencTable=docsVenc.length?`<h2>⚠️ Documentos com Vencimento Próximo ou Vencidos</h2><table><tr><th>Empresa</th><th>Documento</th><th>Validade</th><th>Situação</th></tr>${docsVenc.map(s=>{const c=clients.find(x=>x.id===s.clientId);const d=dU(s.validade);return`<tr><td>${c?c.empresa:'—'}</td><td>${s.tipo.split('–')[0].trim()}</td><td>${fD(s.validade)}</td><td><span class="badge ${d<0?'b-err':'b-warn'}">${d<0?`Vencido há ${Math.abs(d)}d`:`${d}d restantes`}</span></td></tr>`}).join('')}</table>`:'';
-
-  const html=buildPDFDoc('Relatório Geral — Segurança & Trabalho',[kpis,clientTable,svcMesTable,agMesTable,tecTable,vencTable]);
-  printPDF(html,'relatorio_geral');
-}
+function closeModals(){['modal-client','modal-service','modal-agend'].forEach(id=>document.getElementById(id).style.display='none')}
+['modal-client','modal-service','modal-agend'].forEach(id=>document.getElementById(id).addEventListener('click',e=>{if(e.target===document.getElementById(id))closeModals()}));
 
 // INIT
-function forceOffline(){
-  try{const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';}catch(e){}
-  try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e){clients=[]}
-  try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e){services=[]}
-  try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e){agendamentos=[]}
-  try{tecnicos=JSON.parse(localStorage.getItem('st_tec_v5')||'[]')}catch(e){tecnicos=[]}
-  try{documentos=JSON.parse(localStorage.getItem('st_doc_v5')||'[]')}catch(e){documentos=[]}
-  setSyncStatus('📴 Modo offline');
-  updateStats();renderClients();updateAlertBadge();
-  showPage('dashboard');
-}
-
-// Carrega dados locais imediatamente e tenta sincronizar em background
-function loadLocal(){
-  try{clients=JSON.parse(localStorage.getItem('st_clients_v5')||'[]')}catch(e){clients=[]}
-  try{services=JSON.parse(localStorage.getItem('st_services_v5')||'[]')}catch(e){services=[]}
-  try{agendamentos=JSON.parse(localStorage.getItem('st_agend_v5')||'[]')}catch(e){agendamentos=[]}
-  try{tecnicos=JSON.parse(localStorage.getItem('st_tec_v5')||'[]')}catch(e){tecnicos=[]}
-  try{documentos=JSON.parse(localStorage.getItem('st_doc_v5')||'[]')}catch(e){documentos=[]}
-}
-
 (async()=>{
   updateSidebarDate();
-  
-  // 1. Carrega dados locais e abre o sistema IMEDIATAMENTE
   loadLocal();
-  try{const _ov=document.getElementById('loading-overlay');if(_ov)_ov.style.display='none';}catch(e){}
   updateStats();renderClients();updateAlertBadge();
   showPage('dashboard');
-
-  // 2. Tenta sincronizar com Supabase em background (sem travar tela)
-  setSyncStatus('⟳ Sincronizando...');
-  try{
-    const timeout=new Promise((_,rej)=>setTimeout(()=>rej(new Error('timeout')),6000));
-    const fetchAll=Promise.all([
-      supa.from('clientes').select('dados'),
-      supa.from('servicos').select('dados'),
-      supa.from('agendamentos').select('dados'),
-      supa.from('tecnicos').select('dados'),
-      supa.from('documentos').select('dados'),
-    ]);
-    const [rc,rs,ra,rt,rd]=await Promise.race([fetchAll,timeout]);
-    if(rc.error)throw new Error(rc.error.message);
-    
-    const fromCloud=(data)=>(data||[]).map(r=>r.dados).filter(Boolean);
-    const cc=fromCloud(rc.data);
-    const cs=fromCloud(rs.data);
-    const ca=fromCloud(ra.data);
-    const ct=fromCloud(rt.data);
-    const cd=fromCloud(rd.data);
-
-    // Só atualiza se vieram dados da nuvem
-    if(cc.length){clients=cc;}
-    if(cs.length){services=cs;}
-    if(ca.length){agendamentos=ca;}
-    if(ct.length){tecnicos=ct;}
-    if(cd.length){
-      // Restaurar arquivos locais
-      try{
-        const files=JSON.parse(localStorage.getItem('st_doc_files')||'[]');
-        documentos=cd.map(d=>{const f=files.find(x=>x.id===d.id);return f?{...d,fileData:f.fileData,fileMime:f.fileMime}:d;});
-      }catch(e){documentos=cd;}
-    }
-
-    setSyncStatus('☁️ Sincronizado');
-    updateStats();renderClients();updateAlertBadge();
-    // Refresh current page
-    const activePage=document.querySelector('.nav-item.active');
-    if(activePage)activePage.click();
-
-  }catch(e){
-    console.warn('Supabase indisponível:', e.message);
-    setSyncStatus('📴 Offline — dados locais');
-  }
+  setSyncStatus('syncing');
+  await loadData();
+  updateStats();renderClients();updateAlertBadge();
+  showPage('dashboard');
 })();
 </script>
-
-  <div style="font-size:16px;font-weight:700;color:var(--brand)">Segurança &amp; Trabalho</div>
-  <style>@keyframes spin{to{transform:rotate(360deg)}}</style>
-</div>
 </body>
 </html>
